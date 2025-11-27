@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional
 from fastapi import Query
 
 
@@ -9,9 +8,9 @@ class PaginationQueryParam:
 
     def __init__(
         self,
-        page_no: Optional[int] = Query(default=1, description="当前页码", ge=1),
-        page_size: Optional[int] = Query(default=10, description="每页数量", ge=1, le=100), 
-        order_by: Optional[str] = Query(default=None, description="排序字段,格式:field1,asc;field2,desc"),
+        page_no: int = Query(default=1, description="当前页码", ge=1),
+        page_size: int = Query(default=10, description="每页数量", ge=1, le=100), 
+        order_by: str | None = Query(default=None, description="排序字段,格式:field1,asc;field2,desc"),
     ) -> None:
         """
         初始化分页查询参数。

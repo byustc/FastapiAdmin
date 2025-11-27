@@ -24,7 +24,7 @@ from app.core.exceptions import CustomException
 from app.core.logger import log
 from app.utils.cron_util import CronUtil
 
-from app.api.v1.module_application.job.model import JobModel
+from app.api.v1.module_application.job.model import JobLogModel, JobModel
 
 # 租户上下文管理器
 class TenantContext:
@@ -36,7 +36,7 @@ class TenantContext:
     _current_user_id = None
     
     @classmethod
-    def set(cls, tenant_id: int = None, user_id: int = None):
+    def set(cls, tenant_id: int | None = None, user_id: int | None = None):
         """设置租户上下文"""
         cls._current_tenant_id = tenant_id
         cls._current_user_id = user_id
@@ -89,42 +89,6 @@ class SchedulerUtil:
     """
     定时任务相关方法
     """
-
-    @classmethod
-    def _save_job_log_async_wrapper(cls, job_log: 'JobLogModel') -> None:
-        """
-        异步保存任务日志的包装器函数
-        
-        参数:
-        - job_log (JobLogModel): 任务日志模型对象
-        """
-        import asyncio
-        from app.core.database import async_db_session
-        from app.core.logger import log
-        
-        async def _save_log():
-            try:
-                async with async_db_session() as session:
-                    async with session.begin():
-                        # 设置日志的租户ID（如果未设置）
-                        if not job_log.tenant_id and hasattr(job_log, 'job_id'):
-                            # 尝试从job_id中提取租户信息
-                            job_id_str = str(job_log.job_id)
-                            tenant_info = cls._extract_tenant_info(job_id_str)
-                            job_log.tenant_id = tenant_info.get('tenant_id')
-                        
-                        session.add(job_log)
-                        await session.commit()
-                log.info(f"任务日志保存成功: 任务ID={job_log.job_id}, 租户ID={job_log.tenant_id}")
-            except Exception as e:
-                log.error(f"任务日志保存失败: {str(e)}")
-        
-        # 运行异步函数
-        loop = asyncio.new_event_loop()
-        try:
-            loop.run_until_complete(_save_log())
-        finally:
-            loop.close()
             
     @classmethod
     def scheduler_event_listener(cls, event: JobEvent | JobExecutionEvent) -> None:
@@ -154,10 +118,9 @@ class SchedulerUtil:
             # 从任务ID中提取租户信息
             tenant_info = cls._extract_tenant_info(job_id)
             tenant_id = tenant_info.get('tenant_id')
-            original_job_id = tenant_info.get('original_job_id')
             
             # 使用原始任务ID查询任务信息
-            query_job = cls.get_job(job_id=original_job_id if tenant_id else job_id, tenant_id=tenant_id)
+            query_job = cls.get_job(job_id=job_id, tenant_id=tenant_id)
             if query_job:
                 query_job_info = query_job.__getstate__()
                 # 获取任务名称
@@ -175,7 +138,7 @@ class SchedulerUtil:
                 # 获取任务触发器
                 job_trigger = str(query_job_info.get('trigger'))
                 # 构造日志消息
-                job_message = f"事件类型: {event_type}, 任务ID: {original_job_id if tenant_id else job_id}, 租户ID: {tenant_id}, 任务名称: {job_name}, 状态: {status}, 任务组: {job_group}, 错误详情: {exception_info}, 执行于{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                job_message = f"事件类型: {event_type}, 任务ID: {job_id}, 租户ID: {tenant_id}, 任务名称: {job_name}, 状态: {status}, 任务组: {job_group}, 错误详情: {exception_info}, 执行于{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                 
                 # 创建ORM对象
                 job_log = JobLogModel(
@@ -190,13 +153,13 @@ class SchedulerUtil:
                     status=status,
                     exception_info=exception_info,
                     create_time=datetime.now(),
-                    job_id=original_job_id if tenant_id else job_id,
+                    job_id=job_id,
                     tenant_id=tenant_id  # 添加租户ID
                 )
                 
                 # 使用线程池执行操作以避免阻塞调度器和数据库锁定问题
                 executor = ThreadPoolExecutor(max_workers=1)
-                executor.submit(cls._save_job_log_async_wrapper, job_log)
+                executor.submit(cls._save_job_log_async_wrapper, job_log, tenant_id)
                 executor.shutdown(wait=False)
                 
                 log.info(f"任务执行事件: {event_type}, 租户ID: {tenant_id}, 任务ID: {job_id}")
@@ -245,7 +208,7 @@ class SchedulerUtil:
         return f"tenant_{tenant_id}_{job_id}"
     
     @classmethod
-    def _extract_tenant_info(cls, formatted_job_id: str) -> Dict[str, Optional[Union[int, str]]]:
+    def _extract_tenant_info(cls, formatted_job_id: str) -> Dict[str, Optional[int]]:
         """
         从格式化的任务ID中提取租户信息
         
@@ -260,17 +223,15 @@ class SchedulerUtil:
             try:
                 return {
                     'tenant_id': int(parts[1]),
-                    'original_job_id': parts[2]
                 }
             except ValueError:
                 pass
         return {
             'tenant_id': None,
-            'original_job_id': formatted_job_id
         }
     
     @classmethod
-    def _wrap_function_with_context(cls, func: Callable, tenant_id: int, user_id: int = None) -> Callable:
+    def _wrap_function_with_context(cls, func: Callable, tenant_id: int | None = None, user_id: int | None = None) -> Callable:
         """
         包装函数，在执行前设置租户上下文
         
@@ -322,19 +283,17 @@ class SchedulerUtil:
                 auth = AuthSchema(db=session)
                 job_list = await JobCRUD(auth).get_obj_list_crud()
                 for item in job_list:
-                    # 获取任务的租户ID（如果存在）
-                    tenant_id = getattr(item, 'tenant_id', None)
                     
                     # 删除旧任务（使用租户ID进行格式化）
-                    cls.remove_job(job_id=item.id, tenant_id=tenant_id)
+                    cls.remove_job(job_id=item.id, tenant_id=item.tenant_id)
                     
                     # 添加任务，传入租户ID
-                    cls.add_job(item, tenant_id=tenant_id)
+                    cls.add_job(item, tenant_id=item.tenant_id)
                     
                     # 根据数据库中保存的状态来设置任务状态
                     if item.status is False:
                         # 如果任务状态为暂停，则立即暂停刚添加的任务
-                        cls.pause_job(job_id=item.id, tenant_id=tenant_id)
+                        cls.pause_job(job_id=item.id, tenant_id=item.tenant_id)
         
         # 添加租户隔离的事件监听器，只监听任务执行相关事件
         from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, EVENT_JOB_MISSED, EVENT_JOB_ADDED, EVENT_JOB_REMOVED
@@ -359,7 +318,7 @@ class SchedulerUtil:
             log.error(f'关闭定时任务失败: {str(e)}')
 
     @classmethod
-    def get_job(cls, job_id: Union[str, int], tenant_id: Optional[int] = None) -> Optional[Job]:
+    def get_job(cls, job_id: int, tenant_id: Optional[int] = None) -> Optional[Job]:
         """
         根据任务ID获取任务对象。
     
@@ -385,7 +344,7 @@ class SchedulerUtil:
         return scheduler.get_jobs()
 
     @classmethod
-    def add_job(cls, job_info: JobModel, tenant_id: Optional[int] = None) -> Job:
+    def add_job(cls, job_info: JobModel, tenant_id: int | None = None) -> Job:
         """
         根据任务配置创建并添加调度任务。
     
@@ -554,7 +513,7 @@ class SchedulerUtil:
         scheduler.remove_all_jobs()
 
     @classmethod
-    def modify_job(cls, job_id: Union[str, int]) -> Job:
+    def modify_job(cls, job_id: int) -> Job:
         """
         更新指定任务的配置（运行中的任务下次执行生效）。
     
@@ -567,13 +526,13 @@ class SchedulerUtil:
         异常:
         - CustomException: 当任务不存在时抛出。
         """
-        query_job = cls.get_job(job_id=str(job_id)) 
+        query_job = cls.get_job(job_id=job_id) 
         if not query_job:
             raise CustomException(msg=f"未找到该任务：{job_id}")
         return scheduler.modify_job(job_id=str(job_id))
 
     @classmethod
-    def pause_job(cls, job_id: Union[str, int], tenant_id: Optional[int] = None):
+    def pause_job(cls, job_id: int, tenant_id: int | None = None):
         """
         暂停指定任务（仅运行中可暂停，已终止不可）。
 
@@ -595,7 +554,7 @@ class SchedulerUtil:
         log.info(f"暂停任务成功: ID={formatted_job_id}, 租户ID={tenant_id}")
 
     @classmethod
-    def resume_job(cls, job_id: Union[str, int], tenant_id: Optional[int] = None):
+    def resume_job(cls, job_id: int, tenant_id: int | None = None):
         """
         恢复指定任务（仅暂停中可恢复，已终止不可）。
 
@@ -617,7 +576,7 @@ class SchedulerUtil:
         log.info(f"恢复任务成功: ID={formatted_job_id}, 租户ID={tenant_id}")
 
     @classmethod
-    def reschedule_job(cls, job_id: Union[str, int], tenant_id: Optional[int] = None, trigger=None, **trigger_args) -> Optional[Job]:
+    def reschedule_job(cls, job_id: int, tenant_id: int, trigger=None, **trigger_args) -> Optional[Job]:
         """
         重启指定任务的触发器。
 
@@ -655,7 +614,7 @@ class SchedulerUtil:
         return result
     
     @classmethod
-    def get_single_job_status(cls, job_id: Union[str, int], tenant_id: Optional[int] = None) -> str:
+    def get_single_job_status(cls, job_id: int, tenant_id: int | None = None) -> str:
         """
         获取单个任务的当前状态。
 
@@ -706,7 +665,8 @@ class SchedulerUtil:
         return tenant_jobs
 
     # 获取当前租户上下文的辅助函数
-    def get_current_tenant() -> Dict[str, Optional[int]]:
+    @classmethod
+    def get_current_tenant(cls) -> Dict[str, Optional[int]]:
         """
         获取当前任务执行的租户上下文
         

@@ -153,7 +153,7 @@ class JobService:
             SchedulerUtil().pause_job(job_id=id)
             await JobCRUD(auth).set_obj_field_crud(ids=[id], status=False)
         elif option == 2:
-            SchedulerUtil().resume_job(job_id=id)
+            SchedulerUtil().resume_job(job_id=id, tenant_id=obj.tenant_id)
             await JobCRUD(auth).set_obj_field_crud(ids=[id], status=True)
         elif option == 3:
             # 重启任务：先移除再添加，确保使用最新的任务配置

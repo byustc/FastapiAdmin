@@ -25,7 +25,7 @@ class JobCreateSchema(BaseModel):
     start_date: Optional[str] = Field(default=None, description='开始时间')
     end_date: Optional[str] = Field(default=None, description='结束时间')
     description: Optional[str] = Field(default=None, max_length=255, description='描述')
-    status: Optional[str] = Field(default=False, description='任务状态:启动,停止')
+    status: Optional[str] = Field(default='0', description='任务状态:启动,停止')
 
     @field_validator('trigger')
     @classmethod
@@ -77,7 +77,7 @@ class JobLogCreateSchema(BaseModel):
     job_trigger: Optional[str] = Field(default=None, description='任务触发器')
     job_message: Optional[str] = Field(default=None, description='日志信息')
     exception_info: Optional[str] = Field(default=None, description='异常信息')
-    status: Optional[str] = Field(default=False, description='任务状态:正常,失败')
+    status: Optional[str] = Field(default='0', description='任务状态:正常,失败')
     create_time: Optional[DateTimeStr] = Field(default=None, description='创建时间')
 
 

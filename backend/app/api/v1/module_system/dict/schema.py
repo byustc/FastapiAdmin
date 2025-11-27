@@ -14,10 +14,10 @@ class DictTypeCreateSchema(BaseModel):
     字典类型表对应pydantic模型
     """
 
-    dict_name: str = Field(..., min_length=1, max_length=100, description='字典名称', example='用户状态')
-    dict_type: str = Field(..., min_length=1, max_length=100, description='字典类型', example='sys_user_status')
-    status: Optional[str] = Field(default=None, description='状态（1正常 0停用）', example=True)
-    description: Optional[str] = Field(default=None, max_length=255, description="描述", example="用户账号状态管理")
+    dict_name: str = Field(..., min_length=1, max_length=100, description='字典名称')
+    dict_type: str = Field(..., min_length=1, max_length=100, description='字典类型')
+    status: Optional[str] = Field(default=None, description='状态（1正常 0停用）')
+    description: Optional[str] = Field(default=None, max_length=255, description="描述")
 
     @field_validator('dict_name')
     def validate_dict_name(cls, value: str):
@@ -73,16 +73,16 @@ class DictDataCreateSchema(BaseModel):
     """
     字典数据表对应pydantic模型
     """
-    dict_sort: int = Field(..., ge=1, le=999, description='字典排序', example=1)
-    dict_label: str = Field(..., max_length=100, description='字典标签', example='正常')
-    dict_value: str = Field(..., max_length=100, description='字典键值', example='0')
-    dict_type: str = Field(..., max_length=100, description='字典类型', example='sys_user_status')
-    dict_type_id: int = Field(..., description='字典类型ID', example=1)
-    css_class: Optional[str] = Field(default=None, max_length=100, description='样式属性（其他样式扩展）', example='label-success')
-    list_class: Optional[str] = Field(default=None, description='表格回显样式', example='success')
-    is_default: Optional[bool] = Field(default=None, description='是否默认（Y是 N否）', example=True)
-    status: Optional[str] = Field(default=None, description='状态（1正常 0停用）', example=True)
-    description: Optional[str] = Field(default=None, max_length=255, description="描述", example="正常状态的用户")
+    dict_sort: int = Field(..., ge=1, le=999, description='字典排序')
+    dict_label: str = Field(..., max_length=100, description='字典标签')
+    dict_value: str = Field(..., max_length=100, description='字典键值')
+    dict_type: str = Field(..., max_length=100, description='字典类型')
+    dict_type_id: int = Field(..., description='字典类型ID')
+    css_class: Optional[str] = Field(default=None, max_length=100, description='样式属性（其他样式扩展）')
+    list_class: Optional[str] = Field(default=None, description='表格回显样式')
+    is_default: Optional[str] = Field(default=None, description='是否默认（Y是 N否）')
+    status: Optional[str] = Field(default=None, description='状态（1正常 0停用）')
+    description: Optional[str] = Field(default=None, max_length=255, description="描述")
     
     @model_validator(mode='after')
     def validate_after(self):

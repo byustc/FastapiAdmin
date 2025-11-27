@@ -211,7 +211,7 @@ async def get_job_log_controller():
             "coalesce": i.coalesce,
             "max_instances": i.max_instances,
             "next_run_time": i.next_run_time,
-            "state": SchedulerUtil.get_single_job_status(job_id=i.id)
+            "state": SchedulerUtil.get_single_job_status(job_id=i.id, tenant_id=None)
         }
         for i in SchedulerUtil.get_all_jobs()
     ]

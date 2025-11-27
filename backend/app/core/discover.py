@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from ast import List
+from enum import Enum
 import importlib
 import sys
 from pathlib import Path
@@ -328,7 +330,7 @@ class DiscoverRouter:
         return self
     
     @_log_error_handling
-    def register_router(self, router: APIRouter, tags: Optional[Union[str, List[str]]] = None) -> None:
+    def register_router(self, router: APIRouter, tags: Optional[list[str | Enum]] = None) -> None:
         """手动注册一个路由实例
         
         参数:

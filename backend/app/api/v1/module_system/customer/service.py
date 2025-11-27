@@ -5,6 +5,7 @@ from typing import Any, List, Dict, Optional
 from fastapi import UploadFile
 import pandas as pd
 
+from app.api.v1.module_system.tenant.crud import TenantCRUD
 from app.core.base_schema import BatchSetAvailable
 from app.core.exceptions import CustomException
 from app.utils.excel_util import ExcelUtil

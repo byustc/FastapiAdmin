@@ -13,14 +13,10 @@ class TenantCreateSchema(BaseModel):
     """新增模型"""
     name: str = Field(..., max_length=64, description='租户名称')
     code: Optional[str] = Field(default=None, max_length=20, description='租户编码')
-    status: str = Field(True, description="是否启用(True:启用 False:禁用)")
+    status: str = Field(default="0", description="是否启用(True:启用 False:禁用)")
     description: Optional[str] = Field(default=None, max_length=255, description="描述")
     start_time: Optional[DateTimeStr] = Field(default=None, description="开始时间")
     end_time: Optional[DateTimeStr] = Field(default=None, description="结束时间")
-    
-    # 租户配额设置 - 只保留用户数量限制
-    max_user_count: Optional[int] = Field(default=100, ge=0, description='最大用户数量限制')
-    enable_quota_limit: bool = Field(True, description='是否启用配额限制')
     
     @field_validator('name')    
     @classmethod
@@ -48,15 +44,11 @@ class TenantCreateSchema(BaseModel):
 class TenantUpdateSchema(TenantCreateSchema):
     """更新模型"""
     name: Optional[str] = Field(None, max_length=64, description='租户名称')
-    code: Optional[str] = Field(None, max_length=20, description='租户编码')
 
 
 class TenantOutSchema(TenantCreateSchema, BaseSchema):
     """响应模型"""
     model_config = ConfigDict(from_attributes=True)
-    
-    # 租户使用统计字段 - 只保留用户数量统计
-    current_user_count: Optional[int] = Field(default=0, description='当前用户数量')
 
 
 class TenantQueryParam:

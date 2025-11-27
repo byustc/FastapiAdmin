@@ -14,7 +14,7 @@ class ParamsCreateSchema(BaseModel):
     config_key: str = Field(..., max_length=500, description="参数键名")
     config_value: Optional[str] = Field(default=None, description="参数键值")
     config_type: bool = Field(default=False, description="系统内置(True:是 False:否)")
-    status: str = Field(default=True, description="状态(True:正常 False:停用)")
+    status: str = Field(default="0", description="状态(True:正常 False:停用)")
     description: Optional[str] = Field(default=None, max_length=500, description="描述")
 
 

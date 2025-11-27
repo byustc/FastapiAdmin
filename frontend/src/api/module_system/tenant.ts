@@ -92,9 +92,6 @@ export interface TenantTable extends BaseType {
   code?: string;
   start_time?: string;
   end_time?: string;
-  max_user_count?: number;
-  enable_quota_limit?: boolean;
-  current_user_count?: number;
 }
 
 export interface TenantForm extends BaseFormType {
@@ -102,6 +99,4 @@ export interface TenantForm extends BaseFormType {
   code?: string;
   start_time?: string;
   end_time?: string;
-  max_user_count?: number;
-  enable_quota_limit?: boolean;
 }

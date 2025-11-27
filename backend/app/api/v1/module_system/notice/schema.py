@@ -14,7 +14,7 @@ class NoticeCreateSchema(BaseModel):
     notice_title: str = Field(..., max_length=50, description='公告标题')
     notice_type: str = Field(..., description='公告类型（1通知 2公告）')
     notice_content: str = Field(..., description='公告内容')
-    status: str = Field(default=True, description="是否启用(True:启用 False:禁用)")
+    status: str = Field(default="0", description="是否启用(True:启用 False:禁用)")
     description: Optional[str] = Field(default=None, max_length=255, description="描述")
 
     @field_validator("notice_type")
@@ -30,10 +30,6 @@ class NoticeCreateSchema(BaseModel):
             raise ValueError("公告标题不能为空")
         if not self.notice_content.strip():
             raise ValueError("公告内容不能为空")
-        # 验证时间范围
-        if self.start_time and self.end_time:
-            if self.start_time >= self.end_time:
-                raise ValueError("开始时间必须早于结束时间")
         return self
 
 

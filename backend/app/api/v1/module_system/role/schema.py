@@ -18,7 +18,7 @@ class RoleCreateSchema(BaseModel):
     code: Optional[str] = Field(default=None, max_length=40, description="角色编码")
     order: Optional[int] = Field(default=1, ge=1, description='显示排序')
     data_scope: Optional[int] = Field(default=1, ge=1, le=5, description='数据权限范围')
-    status: str = Field(default=True, description="是否启用")
+    status: str = Field(default="0", description="是否启用")
     description: Optional[str] = Field(default=None, max_length=255, description="描述")
 
     @field_validator("code")

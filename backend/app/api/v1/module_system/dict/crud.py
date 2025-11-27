@@ -104,31 +104,6 @@ class DictTypeCRUD(CRUDBase[DictTypeModel, DictTypeCreateSchema, DictTypeUpdateS
         """
         return await self.set(ids=ids, status=status)
     
-    async def batch_create_obj_crud(self, data_list: List[DictTypeCreateSchema]) -> List[DictTypeModel]:
-        """
-        批量创建数据字典类型
-        
-        参数:
-        - data_list (List[DictTypeCreateSchema]): 数据字典类型创建模型列表
-        
-        返回:
-        - List[DictTypeModel]: 创建的数据字典类型模型列表
-        """
-        return await self.batch_create(data_list=data_list)
-    
-    async def batch_update_obj_crud(self, ids: List[int], data: DictTypeUpdateSchema) -> int:
-        """
-        批量更新数据字典类型
-        
-        参数:
-        - ids (List[int]): 数据字典类型ID列表
-        - data (DictTypeUpdateSchema): 数据字典类型更新模型
-        
-        返回:
-        - int: 更新的记录数量
-        """
-        return await self.batch_update(ids=ids, data=data)
-    
     async def batch_delete_obj_crud(self, ids: List[int]) -> int:
         """
         批量删除数据字典类型
@@ -239,31 +214,6 @@ class DictDataCRUD(CRUDBase[DictDataModel, DictDataCreateSchema, DictDataUpdateS
         """
         return await self.set(ids=ids, status=status)
     
-    async def batch_create_obj_crud(self, data_list: List[DictDataCreateSchema]) -> List[DictDataModel]:
-        """
-        批量创建数据字典数据
-        
-        参数:
-        - data_list (List[DictDataCreateSchema]): 数据字典数据创建模型列表
-        
-        返回:
-        - List[DictDataModel]: 创建的数据字典数据模型列表
-        """
-        return await self.batch_create(data_list=data_list)
-    
-    async def batch_update_obj_crud(self, ids: List[int], data: DictDataUpdateSchema) -> int:
-        """
-        批量更新数据字典数据
-        
-        参数:
-        - ids (List[int]): 数据字典数据ID列表
-        - data (DictDataUpdateSchema): 数据字典数据更新模型
-        
-        返回:
-        - int: 更新的记录数量
-        """
-        return await self.batch_update(ids=ids, data=data)
-    
     async def batch_delete_obj_crud(self, ids: List[int], exclude_system: bool = True) -> int:
         """
         批量删除数据字典数据
@@ -289,19 +239,19 @@ class DictDataCRUD(CRUDBase[DictDataModel, DictDataCreateSchema, DictDataUpdateS
             await self.delete(ids=ids)
         return len(ids)
     
-    async def get_obj_list_by_dict_type_crud(self, dict_type: str, status: Optional[str] = True) -> List[DictDataModel]:
+    async def get_obj_list_by_dict_type_crud(self, dict_type: str, status: Optional[str] = "0") -> Sequence[DictDataModel]:
         """
         根据字典类型获取字典数据列表
         
         参数:
         - dict_type (str): 字典类型
-        - status (Optional[bool]): 状态过滤，None表示不过滤
+        - status (Optional[str]): 状态过滤，None表示不过滤
         
         返回:
-        - List[DictDataModel]: 数据字典数据模型列表
+        - Sequence[DictDataModel]: 数据字典数据模型序列
         """
         search = {"dict_type": dict_type}
         if status is not None:
             search["status"] = status
-        order_by = [{"field": "sort", "direction": "asc"}]
+        order_by = [{"id": "asc"}]
         return await self.list(search=search, order_by=order_by)

@@ -7,13 +7,10 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.engine import Result
 from sqlalchemy import asc, func, select, delete, Select, desc, update, or_, and_
 from sqlalchemy import inspect as sa_inspect
-from fastapi_pagination import Page, add_pagination, Params
-from fastapi_pagination.ext.sqlalchemy import paginate as pagination_paginate
 
 from app.core.base_model import MappedBase
 from app.core.exceptions import CustomException
 from app.core.permission import Permission
-from app.common.request import PageResultSchema
 from app.api.v1.module_system.auth.schema import AuthSchema
 
 ModelType = TypeVar("ModelType", bound=MappedBase)
@@ -275,10 +272,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if len(pk_cols) > 1:
                 raise CustomException(msg="暂不支持复合主键的批量删除")
             sql = delete(self.model).where(pk_cols[0].in_(ids))
-            # 权限条件
-            perm = await self.__permission_condition()
-            if perm is not None:
-                sql = sql.where(perm)
             await self.db.execute(sql)
             await self.db.flush()
         except Exception as e:
@@ -317,10 +310,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if len(pk_cols) > 1:
                 raise CustomException(msg="暂不支持复合主键的批量更新")
             sql = update(self.model).where(pk_cols[0].in_(ids)).values(**kwargs)
-            # 权限条件
-            perm = await self.__permission_condition()
-            if perm is not None:
-                sql = sql.where(perm)
             await self.db.execute(sql)
             await self.db.flush()
         except Exception as e:
@@ -330,6 +319,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         过滤数据权限（仅用于Select）。
         """
+        if not self.current_user:
+            raise CustomException(msg="当前用户不存在，无法过滤数据权限")
         filter = Permission(
             db=self.db,
             model=self.model,

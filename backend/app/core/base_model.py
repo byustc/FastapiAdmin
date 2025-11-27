@@ -6,6 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from typing import Optional
 
+from app.api.v1.module_system.customer.model import CustomerModel
+from app.api.v1.module_system.tenant.model import TenantModel
+from app.api.v1.module_system.user.model import UserModel
 from app.utils.common_util import uuid4_str
 
 

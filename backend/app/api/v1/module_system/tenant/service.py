@@ -8,7 +8,6 @@ from typing import Any, List, Dict, Optional
 from fastapi import UploadFile
 import pandas as pd
 
-from sqlalchemy import func
 from app.core.base_schema import BatchSetAvailable
 from app.core.exceptions import CustomException
 from app.utils.excel_util import ExcelUtil
@@ -25,105 +24,6 @@ class TenantService:
     """
     租户管理模块服务层
     """
-    
-    @classmethod
-    async def _check_quota_limit(cls, auth: AuthSchema, tenant_id: int, resource_type: str, increment: int = 1) -> bool:
-        """
-        检查租户资源配额限制 - 只检查用户配额
-        
-        参数:
-        - auth (AuthSchema): 认证信息
-        - tenant_id (int): 租户ID
-        - resource_type (str): 资源类型，当前仅支持 'user'
-        - increment (int): 要增加的资源数量，默认为1
-        
-        返回:
-        - bool: 是否允许创建
-        
-        异常:
-        - CustomException: 当配额不足时抛出
-        """
-        # 系统租户不受配额限制
-        if tenant_id == 1:
-            return True
-        
-        # 只处理用户类型的配额检查
-        if resource_type != 'user':
-            return True
-        
-        # 获取租户信息
-        tenant = await TenantCRUD(auth).get_by_id_crud(id=tenant_id)
-        if not tenant:
-            raise CustomException(msg="租户不存在")
-        
-        # 如果未启用配额限制，直接返回允许
-        if not tenant.enable_quota_limit:
-            return True
-        
-        # 计算当前用户数量
-        from sqlalchemy.ext.asyncio import AsyncSession
-        from sqlalchemy import select
-        from app.api.v1.module_system.user.model import UserModel
-        
-        session: AsyncSession = AsyncSession.get(auth.db)
-        stmt = select(func.count(UserModel.id)).where(
-            UserModel.tenant_id == tenant_id,
-            UserModel.is_deleted == False
-        )
-        result = await session.execute(stmt)
-        current_count = result.scalar() or 0
-        max_limit = tenant.max_user_count
-        
-        # 检查配额是否足够
-        if current_count + increment > max_limit:
-            raise CustomException(
-                msg=f"租户配额不足！当前用户数量: {current_count}, 最大限制: {max_limit}"
-            )
-        
-        return True
-    
-    @classmethod
-    async def get_tenant_quota_info(cls, auth: AuthSchema, tenant_id: int) -> Dict:
-        """
-        获取租户配额信息和使用统计 - 只返回用户配额信息
-        
-        参数:
-        - auth (AuthSchema): 认证信息
-        - tenant_id (int): 租户ID
-        
-        返回:
-        - Dict: 租户配额信息字典
-        """
-        from sqlalchemy.ext.asyncio import AsyncSession
-        from sqlalchemy import select, func
-        from app.api.v1.module_system.user.model import UserModel
-        
-        tenant = await TenantCRUD(auth).get_by_id_crud(id=tenant_id)
-        if not tenant:
-            raise CustomException(msg="租户不存在")
-        
-        session: AsyncSession = AsyncSession.get(auth.db)
-        
-        # 获取用户数量统计
-        user_stmt = select(func.count(UserModel.id)).where(
-            UserModel.tenant_id == tenant_id,
-            UserModel.is_deleted == False
-        )
-        user_result = await session.execute(user_stmt)
-        current_user_count = user_result.scalar() or 0
-        
-        return {
-            "tenant_id": tenant.id,
-            "tenant_name": tenant.name,
-            "enable_quota_limit": tenant.enable_quota_limit,
-            "quotas": {
-                "user": {
-                    "current": current_user_count,
-                    "max": tenant.max_user_count,
-                    "usage_rate": round(current_user_count / tenant.max_user_count * 100, 2) if tenant.max_user_count > 0 else 0
-                }
-            }
-        }
     
     @classmethod
     async def detail_service(cls, auth: AuthSchema, id: int) -> Dict:
@@ -143,12 +43,6 @@ class TenantService:
         
         # 获取租户详情基础数据
         result = TenantOutSchema.model_validate(obj).model_dump()
-        
-        # 获取租户配额使用统计 - 只更新用户数量
-        quota_info = await cls.get_tenant_quota_info(auth, id)
-        result.update({
-            "current_user_count": quota_info['quotas']['user']['current']
-        })
         
         return result
     
@@ -214,19 +108,9 @@ class TenantService:
         obj = await TenantCRUD(auth).get(code=data.code)
         if obj:
             raise CustomException(msg='创建失败，编码已存在')
-        
-        # 设置默认配额值（如果未提供） - 只设置用户相关配额
-        create_data = data.model_dump()
-        default_quotas = {
-            'max_user_count': 100,
-            'enable_quota_limit': True
-        }
-        for field, default_value in default_quotas.items():
-            if field not in create_data:
-                create_data[field] = default_value
-        
+
         # 创建租户
-        tenant_obj = await TenantCRUD(auth).create_crud(data=create_data)
+        tenant_obj = await TenantCRUD(auth).create_crud(data=data)
         
         # 自动创建租户初始管理员用户
         await cls._create_tenant_admin_user(auth, tenant_obj)
@@ -265,11 +149,8 @@ class TenantService:
                 "created_id": auth.user.id if auth.user else None
             }
             
-            # 检查用户配额
-            await cls._check_quota_limit(auth, tenant_obj.id, 'user', 1)
-            
             # 创建用户
-            new_user = await UserCRUD(auth).create_crud(data=admin_user_data)
+            new_user = await UserCRUD(auth).create(data=admin_user_data)
             
             # 记录日志，包含临时密码信息（仅开发环境记录，生产环境应避免）
             log.info(f"为租户[{tenant_obj.name}]创建初始管理员用户成功，用户名: {username}，临时密码: {password}")
@@ -294,17 +175,9 @@ class TenantService:
         """
         # 系统租户特殊处理
         if id == 1:
-            # 系统租户只允许修改配额相关设置，不允许修改核心信息
-            update_data = data.model_dump(exclude_unset=True)
-            allowed_fields = ['max_user_count', 'enable_quota_limit', 'start_time', 'end_time', 'description']
-            # 过滤出允许修改的字段
-            update_data = {k: v for k, v in update_data.items() if k in allowed_fields}
+            obj = await TenantCRUD(auth).update_crud(id=id, data=data)
+            log.info(f"系统租户配额设置已更新")
             
-            if update_data:
-                obj = await TenantCRUD(auth).update_crud(id=id, data=update_data)
-                log.info(f"系统租户配额设置已更新")
-            else:
-                obj = await TenantCRUD(auth).get_by_id_crud(id=id)
             return TenantOutSchema.model_validate(obj).model_dump()
             
         # 检查数据是否存在
@@ -503,7 +376,7 @@ class TenantService:
                     processed_names.add(name)
                     
                     # 处理编码
-                    code = str(row['code']).strip() if pd.notna(row['code']) else f"T{int(time.time())}{random.randint(100, 999)}"
+                    code = str(row['code']).strip()
                     if code in processed_codes:
                         error_msgs.append(f"第{count}行: 租户编码 '{code}' 在文件中重复")
                         continue
@@ -514,14 +387,9 @@ class TenantService:
                         "name": name,
                         "code": code,
                         "status": status,
-                        "description": str(row['description']).strip() if pd.notna(row['description']) else "",
+                        "description": str(row['description']).strip(),
                     }
                     
-                    # 处理时间字段
-                    if pd.notna(row.get('start_time')):
-                        data['start_time'] = row['start_time']
-                    if pd.notna(row.get('end_time')):
-                        data['end_time'] = row['end_time']
                     
                     # 检查时间有效性
                     if 'start_time' in data and 'end_time' in data and data['start_time'] > data['end_time']:
@@ -608,7 +476,5 @@ class TenantService:
         return ExcelUtil.get_excel_template(
             header_list=header_list,
             selector_header_list=selector_header_list,
-            option_list=option_list,
-            sample_data=sample_data,
-            description=description
+            option_list=option_list
         )

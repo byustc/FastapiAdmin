@@ -220,6 +220,8 @@ class LoginService:
         # 用户认证
         auth = AuthSchema(db=db)
         user = await UserCRUD(auth).get_by_id_crud(id=user_id)
+        if not user:
+            raise CustomException(msg="刷新token失败，用户不存在")
         
         # 记录刷新令牌时的租户信息
         log.info(f"用户ID: {user.id}, 用户名: {user.username}, 租户ID: {user.tenant_id} 正在刷新JWT令牌")

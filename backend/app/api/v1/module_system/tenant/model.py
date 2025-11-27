@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from sqlalchemy import DateTime, String, Integer, Boolean
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from app.core.base_model import ModelMixin
@@ -28,10 +28,6 @@ class TenantModel(ModelMixin):
     code: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, comment='租户编码')
     start_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None, comment='开始时间')
     end_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None, comment='结束时间')
-    
-    # 租户配额相关字段 - 只保留用户数量限制
-    max_user_count: Mapped[int] = mapped_column(Integer, nullable=False, default=100, comment='最大用户数量限制')
-    enable_quota_limit: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, comment='是否启用配额限制')
     
     @validates('name')
     def validate_name(self, key: str, name: str) -> str:

@@ -131,19 +131,6 @@ class UserService:
             # 限制用户类型，非系统管理员只能创建普通用户
             user_dict["user_type"] = "0"
         
-        # 获取要创建用户的租户ID
-        tenant_id = user_dict.get("tenant_id") or (auth.user.tenant_id if auth.user else None)
-        
-        # 执行用户配额检查
-        if tenant_id:
-            try:
-                # 检查该租户的用户配额是否足够
-                await TenantService._check_quota_limit(auth, tenant_id, 'user', 1)
-            except CustomException as e:
-                raise e
-            except Exception as e:
-                log.error(f"用户配额检查失败: {str(e)}")
-        
         # 创建用户
         new_user = await UserCRUD(auth).create(data=user_dict)
 

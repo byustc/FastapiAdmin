@@ -22,7 +22,7 @@ class OperationLogCreateSchema(BaseModel):
     response_code: Optional[int] = Field(default=None, description="响应状态码")
     response_json: Optional[str] = Field(default=None, description="响应 JSON 数据")
     process_time: Optional[str] = Field(default=None, description="处理时间")
-    status: Optional[str] = Field(default=True, description="是否成功")
+    status: Optional[str] = Field(default="0", description="是否成功")
     description: Optional[str] = Field(default=None, max_length=255, description="描述")
     created_id: Optional[int] = Field(default=None, description="创建人ID")
 

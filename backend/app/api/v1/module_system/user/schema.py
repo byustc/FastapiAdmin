@@ -94,10 +94,11 @@ class UserCreateSchema(CurrentUserUpdateSchema):
     
     username: Optional[str] = Field(default=None, max_length=32, description="用户名")
     password: Optional[str] = Field(default=None, max_length=128, description="密码哈希值")
-    status: str = Field(default=True, description="是否可用")
+    status: str = Field(default="0", description="是否可用")
     description: Optional[str] = Field(default=None, max_length=255, description="备注")
     user_type: Optional[str] = Field(default="0", max_length=32, description="用户类型")
-    
+    is_superuser: Optional[bool] = Field(default=False, description="是否超管")
+    tenant_id: Optional[int] = Field(default=None, description='租户ID')
     dept_id: Optional[int] = Field(default=None, description='部门ID')
     role_ids: Optional[List[int]] = Field(default=[], description='角色ID')
     position_ids: Optional[List[int]] = Field(default=[], description='岗位ID')
