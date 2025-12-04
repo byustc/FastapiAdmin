@@ -325,7 +325,6 @@ docker compose down
 - 数据访问层：`backend/app/api/v1/module_{module_name}/{business_name}/crud.py`
 - 数据模型层：`backend/app/api/v1/module_{module_name}/{business_name}/model.py`
 - 数据模式层：`backend/app/api/v1/module_{module_name}/{business_name}/schema.py`
-- 查询参数层：`backend/app/api/v1/module_{module_name}/{business_name}/param.py`
 
 **前端文件**：
 - API接口文件：`frontend/src/api/module_{module_name}/{business_name}.ts`

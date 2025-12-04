@@ -424,13 +424,13 @@ class GenConstant:
     COLUMNNAME_NOT_EDIT_SHOW = ["uuid"]
 
     # 页面不需要编辑字段
-    COLUMNNAME_NOT_EDIT = ["id", "uuid", "description", "created_time", "updated_time"]
+    COLUMNNAME_NOT_EDIT = ["id", "uuid", "created_time", "updated_time"]
     
     # 页面不需要显示的列表字段
-    COLUMNNAME_NOT_LIST = ["id", "uuid", "description", "created_time", "updated_time"]
+    COLUMNNAME_NOT_LIST = ["id", "uuid"]
     
     # 页面不需要查询字段
-    COLUMNNAME_NOT_QUERY = ["id", "uuid", "description", "created_time", "updated_time"]
+    COLUMNNAME_NOT_QUERY = ["id", "uuid", "description"]
     
     # Crud基类字段
     CRUD_COLUMN_NOT_EDIT = ["create_by", "description", "created_time",  "updated_time"]

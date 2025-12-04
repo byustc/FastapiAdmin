@@ -172,14 +172,8 @@ class UserService:
             if not dept.status:
                 raise CustomException(msg='部门已被禁用')
         
-        # 更新密码
-        update_dict = {}
-        if data.password:
-            update_dict['password'] = PwdUtil.set_password_hash(password=data.password)
-        
-        # 更新用户 - 排除不应被修改的字段
+        # 更新用户 - 排除不应被修改的字段, 更新不更新密码
         user_dict = data.model_dump(exclude_unset=True, exclude={"role_ids", "position_ids", "last_login", "password"})
-        user_dict.update(update_dict)
         new_user = await UserCRUD(auth).update(id=id, data=user_dict)
 
         # 更新角色和岗位
