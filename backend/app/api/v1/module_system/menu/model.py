@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, String, Integer, JSON, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from app.core.base_model import ModelMixin, TenantMixin
+from app.core.base_model import ModelMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.role.model import RoleModel
 
 
-class MenuModel(ModelMixin, TenantMixin):
+class MenuModel(ModelMixin):
     """
     菜单表 - 用于存储系统菜单信息
     
@@ -22,7 +22,7 @@ class MenuModel(ModelMixin, TenantMixin):
     """
     __tablename__: str = "sys_menu"
     __table_args__: dict[str, str] = ({'comment': '菜单表'})
-    __loader_options__: list[str] = ["roles", "tenant"]
+    __loader_options__: list[str] = ["roles"]
 
     name: Mapped[str] = mapped_column(String(50), nullable=False, comment='菜单名称')
     type: Mapped[int] = mapped_column(Integer, nullable=False, default=2, comment='菜单类型(1:目录 2:菜单 3:按钮/权限 4:链接)')

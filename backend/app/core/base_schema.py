@@ -35,22 +35,6 @@ class UserBySchema(BaseModel):
     updated_by: CommonSchema | None = Field(default=None, description="更新人信息")
 
 
-class TenantSchema(BaseModel):
-    """租户模型"""
-    model_config = ConfigDict(from_attributes=True)
-
-    tenant_id: int | None = Field(default=None, description="所属租户ID")
-    tenant: CommonSchema | None = Field(default=None, description="租户信息")
-
-
-class CustomerSchema(BaseModel):
-    """客户模型"""
-    model_config = ConfigDict(from_attributes=True)
-
-    customer_id: int | None = Field(default=None, description="所属客户ID")
-    customer: CommonSchema | None = Field(default=None, description="客户信息")
-
-
 class BatchSetAvailable(BaseModel):
     """批量设置可用状态的请求模型"""
     ids: list[int] = Field(default_factory=list, description="ID列表")
