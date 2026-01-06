@@ -167,8 +167,8 @@
         :data="pageTableData"
         class="data-table__content"
         highlight-current-row
-        height="500"
-        max-height="500"
+        height="450"
+        max-height="450"
         border
         stripe
         @selection-change="handleSelectionChange"

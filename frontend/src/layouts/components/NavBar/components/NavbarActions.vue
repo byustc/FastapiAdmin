@@ -32,13 +32,16 @@
     <div class="navbar-actions__item">
       <el-dropdown trigger="click">
         <div class="user-profile">
-          <template v-if="userStore.basicInfo.avatar">
-            <el-avatar size="small" :src="userStore.basicInfo.avatar" />
-          </template>
-          <template v-else>
-            <el-avatar size="small" icon="UserFilled" />
-          </template>
-          <span class="user-profile__name">{{ userStore.basicInfo.username }}</span>
+          <div class="user-profile__avatar-wrapper">
+            <template v-if="userStore.basicInfo.avatar">
+              <el-avatar size="default" :src="userStore.basicInfo.avatar" />
+            </template>
+            <template v-else>
+              <el-avatar size="default" icon="UserFilled" />
+            </template>
+            <span class="user-profile__online-indicator"></span>
+          </div>
+          <span class="user-profile__name">{{ userStore.basicInfo.name }}</span>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
@@ -302,8 +305,26 @@ function logout() {
     justify-content: center;
     padding: 0 8px;
 
+    &__avatar-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     &__avatar {
       border-radius: 50%;
+    }
+
+    &__online-indicator {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 8px;
+      height: 8px;
+      background-color: #50b731;
+      border-radius: 50%;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
     }
 
     &__name {

@@ -145,8 +145,8 @@
         :data="pageTableData"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         class="data-table__content"
-        height="600"
-        max-height="600"
+        height="540"
+        max-height="540"
         border
         stripe
         @selection-change="handleSelectionChange"
