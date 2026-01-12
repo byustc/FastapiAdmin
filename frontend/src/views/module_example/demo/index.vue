@@ -322,9 +322,7 @@
           min-width="140"
         >
           <template #default="scope">
-            <el-tooltip :content="JSON.stringify(scope.row.i)" placement="top">
-              <div class="json-preview">{{ JSON.stringify(scope.row.i) }}</div>
-            </el-tooltip>
+            <JsonPretty :value="scope.row.i" height="100px" />
           </template>
         </el-table-column>
         <el-table-column
@@ -465,9 +463,7 @@
             {{ detailFormData.h }}
           </el-descriptions-item>
           <el-descriptions-item label="元数据" :span="2">
-            <el-tooltip :content="JSON.stringify(detailFormData.i)" placement="top">
-              <div class="json-preview">{{ JSON.stringify(detailFormData.i) }}</div>
-            </el-tooltip>
+            <JsonPretty :value="detailFormData.i" height="140px" />
           </el-descriptions-item>
           <el-descriptions-item label="描述" :span="2">
             {{ detailFormData.description }}
@@ -529,10 +525,16 @@
               type="date"
               placeholder="请选择日期"
               style="width: 100%"
+              value-format="YYYY-MM-DD"
             />
           </el-form-item>
           <el-form-item label="时间" prop="f">
-            <el-time-picker v-model="formData.f" placeholder="请选择时间" style="width: 100%" />
+            <el-time-picker
+              v-model="formData.f"
+              placeholder="请选择时间"
+              style="width: 100%"
+              value-format="HH:mm:ss"
+            />
           </el-form-item>
           <el-form-item label="日期时间" prop="g">
             <el-date-picker
@@ -540,6 +542,7 @@
               type="datetime"
               placeholder="请选择日期时间"
               style="width: 100%"
+              value-format="YYYY-MM-DD HH:mm:ss"
             />
           </el-form-item>
           <el-form-item label="长文本" prop="h">
@@ -862,6 +865,8 @@ async function handleCloseDialog() {
 
 // 打开弹窗
 async function handleOpenDialog(type: "create" | "update" | "detail", id?: number) {
+  // 每次打开弹窗前先重置表单
+  resetForm();
   dialogVisible.type = type;
   if (id) {
     const response = await DemoAPI.getDemoDetail(id);
@@ -885,44 +890,7 @@ async function handleSubmit() {
   dataFormRef.value.validate(async (valid: any) => {
     if (valid) {
       loading.value = true;
-      // 处理元数据字段，将字符串转换为JSON对象
       const submitData = { ...formData };
-      if (submitData.i && typeof submitData.i === "string") {
-        try {
-          submitData.i = JSON.parse(submitData.i);
-        } catch (error: any) {
-          ElMessage.error("元数据格式错误，请输入有效的JSON字符串" + error.message);
-          loading.value = false;
-          return;
-        }
-      }
-
-      // 处理时间字段格式
-      const formatDate = (date: Date | string | undefined): string | undefined => {
-        if (!date) return undefined;
-        const d = typeof date === "string" ? new Date(date) : date;
-        return d.toISOString().split("T")[0]; // 只保留日期部分 YYYY-MM-DD
-      };
-
-      const formatTime = (time: Date | string | undefined): string | undefined => {
-        if (!time) return undefined;
-        const t = typeof time === "string" ? new Date(time) : time;
-        return t.toTimeString().split(" ")[0]; // 只保留时间部分 HH:MM:SS
-      };
-
-      const formatDateTime = (datetime: Date | string | undefined): string | undefined => {
-        if (!datetime) return undefined;
-        const dt = typeof datetime === "string" ? new Date(datetime) : datetime;
-        const datePart = dt.toISOString().split("T")[0];
-        const timePart = dt.toTimeString().split(" ")[0];
-        return `${datePart} ${timePart}`; // 日期时间格式 YYYY-MM-DD HH:MM:SS
-      };
-
-      // 应用格式化
-      submitData.e = formatDate(submitData.e);
-      submitData.f = formatTime(submitData.f);
-      submitData.g = formatDateTime(submitData.g);
-      // 根据弹窗传入的参数(deatil\create\update)判断走什么逻辑
       const id = formData.id;
       if (id) {
         try {

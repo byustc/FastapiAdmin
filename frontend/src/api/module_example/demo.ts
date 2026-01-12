@@ -92,6 +92,8 @@ export interface DemoPageQuery extends PageQuery {
 
 export interface DemoTable extends BaseType {
   name?: string;
+  status?: string;
+  description?: string;
   created_by?: CommonType;
   updated_by?: CommonType;
   a?: number;
@@ -107,13 +109,15 @@ export interface DemoTable extends BaseType {
 
 export interface DemoForm extends BaseFormType {
   name?: string;
+  status?: string;
+  description?: string;
   a?: number;
   b?: number;
   c?: number;
   d?: boolean;
   e?: string;
-  f?: string;
-  g?: string;
+  f?: Date | string;
+  g?: Date | string;
   h?: string;
   i?: Record<string, any>;
 }

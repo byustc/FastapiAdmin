@@ -13,6 +13,10 @@ export function formatToDate(date?: dayjs.ConfigType, format = DATE_FORMAT): str
   return dayjs(date).format(format);
 }
 
+export function formatToTime(time?: dayjs.ConfigType, format = "HH:mm:ss"): string {
+  return dayjs(time).format(format);
+}
+
 export const useNow = (immediate = true) => {
   let timer: ReturnType<typeof setInterval>;
 
