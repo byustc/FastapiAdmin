@@ -24,13 +24,13 @@ class DictTypeCreateSchema(BaseModel):
     description: str | None = Field(default=None, max_length=255, description="描述")
 
     @field_validator("dict_name")
-    def validate_dict_name(self, value: str):
+    def validate_dict_name(cls, value: str):
         if not value or value.strip() == "":
             raise ValueError("字典名称不能为空")
         return value.strip()
 
     @field_validator("dict_type")
-    def validate_dict_type(self, value: str):
+    def validate_dict_type(cls, value: str):
         if not value or value.strip() == "":
             raise ValueError("字典类型不能为空")
         regexp = r"^[a-z][a-z0-9_]*$"

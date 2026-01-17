@@ -16,9 +16,11 @@ from app.utils.common_util import bytes2file_response
 
 from .schema import (
     DictDataCreateSchema,
+    DictDataOutSchema,
     DictDataQueryParam,
     DictDataUpdateSchema,
     DictTypeCreateSchema,
+    DictTypeOutSchema,
     DictTypeQueryParam,
     DictTypeUpdateSchema,
 )
@@ -31,6 +33,7 @@ DictRouter = APIRouter(route_class=OperationLogRoute, prefix="/dict", tags=["字
     "/type/detail/{id}",
     summary="获取字典类型详情",
     description="获取字典类型详情",
+    response_model=DictTypeOutSchema,
 )
 async def get_type_detail_controller(
     id: Annotated[int, Path(description="字典类型ID", ge=1)],
@@ -54,7 +57,12 @@ async def get_type_detail_controller(
     return SuccessResponse(data=result_dict, msg="获取字典类型详情成功")
 
 
-@DictRouter.get("/type/list", summary="查询字典类型", description="查询字典类型")
+@DictRouter.get(
+    "/type/list",
+    summary="查询字典类型",
+    description="查询字典类型",
+    response_model=list[DictTypeOutSchema],
+)
 async def get_type_list_controller(
     page: Annotated[PaginationQueryParam, Depends()],
     search: Annotated[DictTypeQueryParam, Depends()],
@@ -90,6 +98,7 @@ async def get_type_list_controller(
     "/type/optionselect",
     summary="获取全部字典类型",
     description="获取全部字典类型",
+    response_model=list[DictTypeOutSchema],
 )
 async def get_type_loptionselect_controller(
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:dict_type:query"]))],
@@ -111,7 +120,12 @@ async def get_type_loptionselect_controller(
     return SuccessResponse(data=result_dict_list, msg="获取字典类型列表成功")
 
 
-@DictRouter.post("/type/create", summary="创建字典类型", description="创建字典类型")
+@DictRouter.post(
+    "/type/create",
+    summary="创建字典类型",
+    description="创建字典类型",
+    response_model=DictTypeOutSchema,
+)
 async def create_type_controller(
     data: DictTypeCreateSchema,
     redis: Annotated[Redis, Depends(redis_getter)],
@@ -136,7 +150,12 @@ async def create_type_controller(
     return SuccessResponse(data=result_dict, msg="创建字典类型成功")
 
 
-@DictRouter.put("/type/update/{id}", summary="修改字典类型", description="修改字典类型")
+@DictRouter.put(
+    "/type/update/{id}",
+    summary="修改字典类型",
+    description="修改字典类型",
+    response_model=DictTypeOutSchema,
+)
 async def update_type_controller(
     data: DictTypeUpdateSchema,
     redis: Annotated[Redis, Depends(redis_getter)],
@@ -163,7 +182,11 @@ async def update_type_controller(
     return SuccessResponse(data=result_dict, msg="修改字典类型成功")
 
 
-@DictRouter.delete("/type/delete", summary="删除字典类型", description="删除字典类型")
+@DictRouter.delete(
+    "/type/delete",
+    summary="删除字典类型",
+    description="删除字典类型",
+)
 async def delete_type_controller(
     redis: Annotated[Redis, Depends(redis_getter)],
     ids: Annotated[list[int], Body(description="ID列表")],
@@ -215,7 +238,11 @@ async def batch_set_available_dict_type_controller(
     return SuccessResponse(msg="批量修改字典类型状态成功")
 
 
-@DictRouter.post("/type/export", summary="导出字典类型", description="导出字典类型")
+@DictRouter.post(
+    "/type/export",
+    summary="导出字典类型",
+    description="导出字典类型",
+)
 async def export_type_list_controller(
     search: Annotated[DictTypeQueryParam, Depends()],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:dict_type:export"]))],
@@ -249,6 +276,7 @@ async def export_type_list_controller(
     "/data/detail/{id}",
     summary="获取字典数据详情",
     description="获取字典数据详情",
+    response_model=DictDataOutSchema,
 )
 async def get_data_detail_controller(
     id: Annotated[int, Path(description="字典数据ID", ge=1)],
@@ -272,7 +300,12 @@ async def get_data_detail_controller(
     return SuccessResponse(data=result_dict, msg="获取字典数据详情成功")
 
 
-@DictRouter.get("/data/list", summary="查询字典数据", description="查询字典数据")
+@DictRouter.get(
+    "/data/list",
+    summary="查询字典数据",
+    description="查询字典数据",
+    response_model=list[DictDataOutSchema],
+)
 async def get_data_list_controller(
     page: Annotated[PaginationQueryParam, Depends()],
     search: Annotated[DictDataQueryParam, Depends()],
@@ -307,7 +340,12 @@ async def get_data_list_controller(
     return SuccessResponse(data=result_dict, msg="查询字典数据列表成功")
 
 
-@DictRouter.post("/data/create", summary="创建字典数据", description="创建字典数据")
+@DictRouter.post(
+    "/data/create",
+    summary="创建字典数据",
+    description="创建字典数据",
+    response_model=DictDataOutSchema,
+)
 async def create_data_controller(
     data: DictDataCreateSchema,
     redis: Annotated[Redis, Depends(redis_getter)],
@@ -332,7 +370,12 @@ async def create_data_controller(
     return SuccessResponse(data=result_dict, msg="创建字典数据成功")
 
 
-@DictRouter.put("/data/update/{id}", summary="修改字典数据", description="修改字典数据")
+@DictRouter.put(
+    "/data/update/{id}",
+    summary="修改字典数据",
+    description="修改字典数据",
+    response_model=DictDataOutSchema,
+)
 async def update_data_controller(
     data: DictDataUpdateSchema,
     redis: Annotated[Redis, Depends(redis_getter)],
@@ -359,7 +402,11 @@ async def update_data_controller(
     return SuccessResponse(data=result_dict, msg="修改字典数据成功")
 
 
-@DictRouter.delete("/data/delete", summary="删除字典数据", description="删除字典数据")
+@DictRouter.delete(
+    "/data/delete",
+    summary="删除字典数据",
+    description="删除字典数据",
+)
 async def delete_data_controller(
     redis: Annotated[Redis, Depends(redis_getter)],
     ids: Annotated[list[int], Body(description="ID列表")],
@@ -411,7 +458,11 @@ async def batch_set_available_dict_data_controller(
     return SuccessResponse(msg="批量修改字典数据状态成功")
 
 
-@DictRouter.post("/data/export", summary="导出字典数据", description="导出字典数据")
+@DictRouter.post(
+    "/data/export",
+    summary="导出字典数据",
+    description="导出字典数据",
+)
 async def export_data_list_controller(
     search: Annotated[DictDataQueryParam, Depends()],
     page: Annotated[PaginationQueryParam, Depends()],
@@ -448,6 +499,7 @@ async def export_data_list_controller(
     "/data/info/{dict_type}",
     summary="根据字典类型获取数据",
     description="根据字典类型获取数据",
+    response_model=list[DictDataOutSchema],
 )
 async def get_init_dict_data_controller(
     dict_type: str, redis: Annotated[Redis, Depends(redis_getter)]

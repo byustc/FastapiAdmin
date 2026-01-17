@@ -65,8 +65,8 @@ class Settings(BaseSettings):
     # ================================================= #
     SECRET_KEY: str = "vgb0tnl9d58+6n-6h-ea&u^1#s0ccp!794=krylxcjq75vzps$"  # JWT密钥
     ALGORITHM: str = "HS256"  # JWT算法
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 60 * 24 * 1  # access_token过期时间(秒)1 天
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 60 * 24 * 7  # refresh_token过期时间(秒)7 天
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 30  # access_token过期时间(秒)30 分钟
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 30  # refresh_token过期时间(秒)30 分钟
     TOKEN_TYPE: str = "bearer"  # token类型
     TOKEN_REQUEST_PATH_EXCLUDE: list[str] = ["api/v1/auth/login"]  # JWT / RBAC 路由白名单
 
@@ -250,6 +250,15 @@ class Settings(BaseSettings):
             "docs_url": None,
             "redoc_url": None,
             "root_path": self.ROOT_PATH,
+            "responses": {
+                200: {"description": "成功"},
+                400: {"description": "请求参数错误"},
+                401: {"description": "未认证"},
+                403: {"description": "未授权"},
+                404: {"description": "资源不存在"},
+                422: {"description": "请求参数验证错误"},
+                500: {"description": "服务器内部错误"},
+            },
         }
 
 

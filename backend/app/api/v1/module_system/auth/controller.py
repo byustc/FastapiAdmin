@@ -23,7 +23,12 @@ from .service import CaptchaService, LoginService
 AuthRouter = APIRouter(route_class=OperationLogRoute, prefix="/auth", tags=["认证授权"])
 
 
-@AuthRouter.post("/login", summary="登录", description="登录", response_model=JWTOutSchema)
+@AuthRouter.post(
+    "/login",
+    summary="登录",
+    description="登录",
+    response_model=JWTOutSchema,
+)
 async def login_for_access_token_controller(
     request: Request,
     redis: Annotated[Redis, Depends(redis_getter)],

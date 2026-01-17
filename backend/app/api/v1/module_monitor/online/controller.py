@@ -11,7 +11,7 @@ from app.core.dependencies import AuthPermission, redis_getter
 from app.core.logger import log
 from app.core.router_class import OperationLogRoute
 
-from .schema import OnlineQueryParam
+from .schema import OnlineOutSchema, OnlineQueryParam
 from .service import OnlineService
 
 OnlineRouter = APIRouter(route_class=OperationLogRoute, prefix="/online", tags=["在线用户"])
@@ -22,6 +22,7 @@ OnlineRouter = APIRouter(route_class=OperationLogRoute, prefix="/online", tags=[
     dependencies=[Depends(AuthPermission(["module_monitor:online:query"]))],
     summary="获取在线用户列表",
     description="获取在线用户列表",
+    response_model=list[OnlineOutSchema],
 )
 async def get_online_list_controller(
     redis: Annotated[Redis, Depends(redis_getter)],

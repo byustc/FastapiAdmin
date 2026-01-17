@@ -15,6 +15,7 @@ from app.utils.common_util import bytes2file_response
 
 from .schema import (
     RoleCreateSchema,
+    RoleOutSchema,
     RolePermissionSettingSchema,
     RoleQueryParam,
     RoleUpdateSchema,
@@ -24,7 +25,12 @@ from .service import RoleService
 RoleRouter = APIRouter(route_class=OperationLogRoute, prefix="/role", tags=["角色管理"])
 
 
-@RoleRouter.get("/list", summary="查询角色", description="查询角色")
+@RoleRouter.get(
+    "/list",
+    summary="查询角色",
+    description="查询角色",
+    response_model=list[RoleOutSchema],
+)
 async def get_obj_list_controller(
     page: Annotated[PaginationQueryParam, Depends()],
     search: Annotated[RoleQueryParam, Depends()],
@@ -56,7 +62,12 @@ async def get_obj_list_controller(
     return SuccessResponse(data=result_dict, msg="查询角色成功")
 
 
-@RoleRouter.get("/detail/{id}", summary="查询角色详情", description="查询角色详情")
+@RoleRouter.get(
+    "/detail/{id}",
+    summary="查询角色详情",
+    description="查询角色详情",
+    response_model=RoleOutSchema,
+)
 async def get_obj_detail_controller(
     id: Annotated[int, Path(description="角色ID")],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:role:detail"]))],
@@ -76,7 +87,12 @@ async def get_obj_detail_controller(
     return SuccessResponse(data=result_dict, msg="获取角色详情成功")
 
 
-@RoleRouter.post("/create", summary="创建角色", description="创建角色")
+@RoleRouter.post(
+    "/create",
+    summary="创建角色",
+    description="创建角色",
+    response_model=RoleOutSchema,
+)
 async def create_obj_controller(
     data: RoleCreateSchema,
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:role:create"]))],
@@ -96,7 +112,12 @@ async def create_obj_controller(
     return SuccessResponse(data=result_dict, msg="创建角色成功")
 
 
-@RoleRouter.put("/update/{id}", summary="修改角色", description="修改角色")
+@RoleRouter.put(
+    "/update/{id}",
+    summary="修改角色",
+    description="修改角色",
+    response_model=RoleOutSchema,
+)
 async def update_obj_controller(
     data: RoleUpdateSchema,
     id: Annotated[int, Path(description="角色ID")],
@@ -118,7 +139,11 @@ async def update_obj_controller(
     return SuccessResponse(data=result_dict, msg="修改角色成功")
 
 
-@RoleRouter.delete("/delete", summary="删除角色", description="删除角色")
+@RoleRouter.delete(
+    "/delete",
+    summary="删除角色",
+    description="删除角色",
+)
 async def delete_obj_controller(
     ids: Annotated[list[int], Body(description="ID列表")],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:role:delete"]))],
@@ -162,7 +187,11 @@ async def batch_set_available_obj_controller(
     return SuccessResponse(msg="批量修改角色状态成功")
 
 
-@RoleRouter.patch("/permission/setting", summary="角色授权", description="角色授权")
+@RoleRouter.patch(
+    "/permission/setting",
+    summary="角色授权",
+    description="角色授权",
+)
 async def set_role_permission_controller(
     data: RolePermissionSettingSchema,
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:role:permission"]))],
@@ -182,7 +211,11 @@ async def set_role_permission_controller(
     return SuccessResponse(msg="授权角色成功")
 
 
-@RoleRouter.post("/export", summary="导出角色", description="导出角色")
+@RoleRouter.post(
+    "/export",
+    summary="导出角色",
+    description="导出角色",
+)
 async def export_obj_list_controller(
     search: Annotated[RoleQueryParam, Depends()],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:role:export"]))],

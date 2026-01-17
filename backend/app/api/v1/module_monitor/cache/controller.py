@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from redis.asyncio.client import Redis
 
+from app.api.v1.module_monitor.cache.schema import CacheInfoSchema, CacheMonitorSchema
 from app.common.response import SuccessResponse
 from app.core.dependencies import AuthPermission, redis_getter
 from app.core.exceptions import CustomException
@@ -20,6 +21,7 @@ CacheRouter = APIRouter(route_class=OperationLogRoute, prefix="/cache", tags=["�
     dependencies=[Depends(AuthPermission(["module_monitor:cache:query"]))],
     summary="获取缓存监控信息",
     description="获取缓存监控信息",
+    response_model=CacheMonitorSchema,
 )
 async def get_monitor_cache_info_controller(
     redis: Annotated[Redis, Depends(redis_getter)],
@@ -40,6 +42,7 @@ async def get_monitor_cache_info_controller(
     dependencies=[Depends(AuthPermission(["module_monitor:cache:query"]))],
     summary="获取缓存名称列表",
     description="获取缓存名称列表",
+    response_model=list[CacheInfoSchema],
 )
 async def get_monitor_cache_name_controller() -> JSONResponse:
     """
@@ -58,6 +61,7 @@ async def get_monitor_cache_name_controller() -> JSONResponse:
     dependencies=[Depends(AuthPermission(["module_monitor:cache:query"]))],
     summary="获取缓存键名列表",
     description="获取缓存键名列表",
+    response_model=list[CacheInfoSchema],
 )
 async def get_monitor_cache_key_controller(
     cache_name: str, redis: Annotated[Redis, Depends(redis_getter)]
@@ -83,6 +87,7 @@ async def get_monitor_cache_key_controller(
     dependencies=[Depends(AuthPermission(["module_monitor:cache:query"]))],
     summary="获取缓存值",
     description="获取缓存值",
+    response_model=CacheInfoSchema,
 )
 async def get_monitor_cache_value_controller(
     cache_name: str,

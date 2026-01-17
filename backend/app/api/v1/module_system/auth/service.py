@@ -149,8 +149,8 @@ class LoginService:
         # 确保在请求上下文中设置用户名和会话ID
         request.scope["user_username"] = user.username
 
-        access_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        refresh_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+        access_expires = timedelta(seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        refresh_expires = timedelta(seconds=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
 
         now = datetime.now()
 
@@ -251,8 +251,8 @@ class LoginService:
         log.info(f"用户ID: {user.id}, 用户名: {user.username} 正在刷新JWT令牌")
 
         # 设置新的 token
-        access_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        refresh_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+        access_expires = timedelta(seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        refresh_expires = timedelta(seconds=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
         now = datetime.now()
 
         session_info_json = json.dumps(session_info)

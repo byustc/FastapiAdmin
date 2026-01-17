@@ -29,7 +29,7 @@ def import_module(module: str, desc: str) -> Any:
     """
     try:
         module_path, module_class = module.rsplit(".", 1)
-        module = str(importlib.import_module(module_path))
+        module = importlib.import_module(module_path)  # pyright: ignore[reportAssignmentType]
         return getattr(module, module_class)
     except ModuleNotFoundError:
         log.error(f"❗️ 导入{desc}失败,未找到模块:{module}")

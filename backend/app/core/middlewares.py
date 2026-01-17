@@ -91,11 +91,11 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
         session_id = self._extract_session_id_from_request(request)
 
         # 组装请求日志字段
-        log_fields = [
-            f"请求来源: {request.client.host if request.client else '未知'}",
-            f"请求方法: {request.method}",
-            f"请求路径: {request.url.path}",
-        ]
+        log_fields = (
+            f"请求来源: {request.client.host if request.client else '未知'},"
+            f"请求方法: {request.method},"
+            f"请求路径: {request.url.path}"
+        )
         log.info(log_fields)
 
         try:

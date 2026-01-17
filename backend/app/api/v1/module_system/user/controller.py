@@ -21,6 +21,7 @@ from .schema import (
     UserChangePasswordSchema,
     UserCreateSchema,
     UserForgetPasswordSchema,
+    UserOutSchema,
     UserQueryParam,
     UserRegisterSchema,
     UserUpdateSchema,
@@ -30,7 +31,12 @@ from .service import UserService
 UserRouter = APIRouter(route_class=OperationLogRoute, prefix="/user", tags=["用户管理"])
 
 
-@UserRouter.get("/current/info", summary="查询当前用户信息", description="查询当前用户信息")
+@UserRouter.get(
+    "/current/info",
+    summary="查询当前用户信息",
+    description="查询当前用户信息",
+    response_model=UserOutSchema,
+)
 async def get_current_user_info_controller(
     auth: Annotated[AuthSchema, Depends(get_current_user)],
 ) -> JSONResponse:
@@ -52,6 +58,7 @@ async def get_current_user_info_controller(
     "/current/avatar/upload",
     summary="上传当前用户头像",
     dependencies=[Depends(get_current_user)],
+    response_model=UserOutSchema,
 )
 async def user_avatar_upload_controller(file: UploadFile, request: Request) -> JSONResponse:
     """
@@ -73,6 +80,7 @@ async def user_avatar_upload_controller(file: UploadFile, request: Request) -> J
     "/current/info/update",
     summary="更新当前用户基本信息",
     description="更新当前用户基本信息",
+    response_model=UserOutSchema,
 )
 async def update_current_user_info_controller(
     data: CurrentUserUpdateSchema,
@@ -97,6 +105,7 @@ async def update_current_user_info_controller(
     "/current/password/change",
     summary="修改当前用户密码",
     description="修改当前用户密码",
+    response_model=UserOutSchema,
 )
 async def change_current_user_password_controller(
     data: UserChangePasswordSchema,
@@ -117,7 +126,12 @@ async def change_current_user_password_controller(
     return SuccessResponse(data=result_dict, msg="修改密码成功, 请重新登录")
 
 
-@UserRouter.put("/reset/password", summary="重置密码", description="重置密码")
+@UserRouter.put(
+    "/reset/password",
+    summary="重置密码",
+    description="重置密码",
+    response_model=UserOutSchema,
+)
 async def reset_password_controller(
     data: ResetPasswordSchema,
     auth: Annotated[AuthSchema, Depends(get_current_user)],
@@ -137,7 +151,12 @@ async def reset_password_controller(
     return SuccessResponse(data=result_dict, msg="重置密码成功")
 
 
-@UserRouter.post("/register", summary="注册用户", description="注册用户")
+@UserRouter.post(
+    "/register",
+    summary="注册用户",
+    description="注册用户",
+    response_model=UserOutSchema,
+)
 async def register_user_controller(
     data: UserRegisterSchema,
     db: Annotated[AsyncSession, Depends(db_getter)],
@@ -158,7 +177,12 @@ async def register_user_controller(
     return SuccessResponse(data=user_register_result, msg="注册用户成功")
 
 
-@UserRouter.post("/forget/password", summary="忘记密码", description="忘记密码")
+@UserRouter.post(
+    "/forget/password",
+    summary="忘记密码",
+    description="忘记密码",
+    response_model=UserOutSchema,
+)
 async def forget_password_controller(
     data: UserForgetPasswordSchema,
     db: Annotated[AsyncSession, Depends(db_getter)],
@@ -179,7 +203,12 @@ async def forget_password_controller(
     return SuccessResponse(data=user_forget_password_result, msg="重置密码成功")
 
 
-@UserRouter.get("/list", summary="查询用户", description="查询用户")
+@UserRouter.get(
+    "/list",
+    summary="查询用户",
+    description="查询用户",
+    response_model=list[UserOutSchema],
+)
 async def get_obj_list_controller(
     page: Annotated[PaginationQueryParam, Depends()],
     search: Annotated[UserQueryParam, Depends()],
@@ -208,7 +237,12 @@ async def get_obj_list_controller(
     return SuccessResponse(data=result_dict, msg="查询用户成功")
 
 
-@UserRouter.get("/detail/{id}", summary="查询用户详情", description="查询用户详情")
+@UserRouter.get(
+    "/detail/{id}",
+    summary="查询用户详情",
+    description="查询用户详情",
+    response_model=UserOutSchema,
+)
 async def get_obj_detail_controller(
     id: Annotated[int, Path(description="用户ID")],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:user:detail"]))],
@@ -228,7 +262,12 @@ async def get_obj_detail_controller(
     return SuccessResponse(data=result_dict, msg="获取用户详情成功")
 
 
-@UserRouter.post("/create", summary="创建用户", description="创建用户")
+@UserRouter.post(
+    "/create",
+    summary="创建用户",
+    description="创建用户",
+    response_model=UserOutSchema,
+)
 async def create_obj_controller(
     data: UserCreateSchema,
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:user:create"]))],
@@ -252,7 +291,12 @@ async def create_obj_controller(
     return SuccessResponse(data=result_dict, msg="创建用户成功")
 
 
-@UserRouter.put("/update/{id}", summary="修改用户", description="修改用户")
+@UserRouter.put(
+    "/update/{id}",
+    summary="修改用户",
+    description="修改用户",
+    response_model=UserOutSchema,
+)
 async def update_obj_controller(
     data: UserUpdateSchema,
     id: Annotated[int, Path(description="用户ID")],
@@ -274,7 +318,11 @@ async def update_obj_controller(
     return SuccessResponse(data=result_dict, msg="修改用户成功")
 
 
-@UserRouter.delete("/delete", summary="删除用户", description="删除用户")
+@UserRouter.delete(
+    "/delete",
+    summary="删除用户",
+    description="删除用户",
+)
 async def delete_obj_controller(
     ids: Annotated[list[int], Body(description="ID列表")],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:user:delete"]))],

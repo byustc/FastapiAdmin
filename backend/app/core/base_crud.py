@@ -263,7 +263,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 if isinstance(data, dict)
                 else data.model_dump(exclude_unset=True, exclude={"id"})
             )
-            obj = await self.get(id=id)
+            # 获取对象时不自动预加载关系，避免循环依赖
+            obj = await self.get(id=id, preload=[])
             if not obj:
                 raise CustomException(msg="更新对象不存在")
 
@@ -276,11 +277,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                     setattr(obj, key, value)
 
             await self.auth.db.flush()
+            # 刷新对象时不自动预加载关系
             await self.auth.db.refresh(obj)
 
             # 权限二次确认：flush后再次验证对象仍在权限范围内
             # 防止并发修改导致的权限逃逸（如其他事务修改了created_id）
-            verify_obj = await self.get(id=id)
+            # 验证时也不自动预加载关系
+            verify_obj = await self.get(id=id, preload=[])
             if not verify_obj:
                 # 对象已被删除或权限已失效
                 raise CustomException(msg="更新失败，对象不存在或无权限访问")

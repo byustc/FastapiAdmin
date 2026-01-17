@@ -12,13 +12,18 @@ from app.core.logger import log
 from app.core.router_class import OperationLogRoute
 from app.utils.common_util import bytes2file_response
 
-from .schema import OperationLogQueryParam
+from .schema import OperationLogOutSchema, OperationLogQueryParam
 from .service import OperationLogService
 
 LogRouter = APIRouter(route_class=OperationLogRoute, prefix="/log", tags=["日志管理"])
 
 
-@LogRouter.get("/list", summary="查询日志", description="查询日志")
+@LogRouter.get(
+    "/list",
+    summary="查询日志",
+    description="查询日志",
+    response_model=list[OperationLogOutSchema],
+)
 async def get_obj_list_controller(
     page: Annotated[PaginationQueryParam, Depends()],
     search: Annotated[OperationLogQueryParam, Depends()],
@@ -50,7 +55,12 @@ async def get_obj_list_controller(
     return SuccessResponse(data=result_dict, msg="查询日志成功")
 
 
-@LogRouter.get("/detail/{id}", summary="日志详情", description="日志详情")
+@LogRouter.get(
+    "/detail/{id}",
+    summary="日志详情",
+    description="日志详情",
+    response_model=OperationLogOutSchema,
+)
 async def get_obj_detail_controller(
     id: Annotated[int, Path(description="操作日志ID")],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:log:detail"]))],
@@ -70,7 +80,11 @@ async def get_obj_detail_controller(
     return SuccessResponse(data=result_dict, msg="获取日志详情成功")
 
 
-@LogRouter.delete("/delete", summary="删除日志", description="删除日志")
+@LogRouter.delete(
+    "/delete",
+    summary="删除日志",
+    description="删除日志",
+)
 async def delete_obj_log_controller(
     ids: Annotated[list[int], Body(description="ID列表")],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:log:delete"]))],
@@ -90,7 +104,11 @@ async def delete_obj_log_controller(
     return SuccessResponse(msg="删除日志成功")
 
 
-@LogRouter.post("/export", summary="导出日志", description="导出日志")
+@LogRouter.post(
+    "/export",
+    summary="导出日志",
+    description="导出日志",
+)
 async def export_obj_list_controller(
     search: Annotated[OperationLogQueryParam, Depends()],
     auth: Annotated[AuthSchema, Depends(AuthPermission(["module_system:log:export"]))],

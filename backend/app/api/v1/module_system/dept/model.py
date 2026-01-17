@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.base_model import ModelMixin, UserMixin
+from app.core.base_model import ModelMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.role.model import RoleModel
     from app.api.v1.module_system.user.model import UserModel
 
 
-class DeptModel(ModelMixin, UserMixin):
+class DeptModel(ModelMixin):
     """
     部门模型
     """
