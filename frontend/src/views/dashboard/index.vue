@@ -50,7 +50,7 @@
                   <div class="i-svg:gitee text-lg color-#F76560" />
                 </el-link>
                 <el-divider direction="vertical" />
-                <el-link href="https://github.com/1014TaoTao/FastapiAdmin" target="_blank">
+                <el-link href="https://github.com/fastapiadmin/FastapiAdmin" target="_blank">
                   <div class="i-svg:github text-lg color-#4080FF" />
                 </el-link>
                 <el-divider direction="vertical" />
@@ -70,7 +70,7 @@
               <div class="i-svg:gitee text-lg color-#F76560" />
             </el-link>
             <el-divider direction="vertical" />
-            <el-link href="https://github.com/1014TaoTao/FastapiAdmin" target="_blank">
+            <el-link href="https://github.com/fastapiadmin/FastapiAdmin" target="_blank">
               <div class="i-svg:github text-lg color-#4080FF" />
             </el-link>
             <el-divider direction="vertical" />

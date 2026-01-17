@@ -66,7 +66,7 @@
   {
     "config_name": "隐私政策",
     "config_key": "sys_web_privacy",
-    "config_value": "https://github.com/1014TaoTao/FastapiAdmin/blob/master/LICENSE",
+    "config_value": "https://github.com/fastapiadmin/FastapiAdmin/blob/master/LICENSE",
     "config_type": true,
     "status": "0",
     "description": "初始化数据"
@@ -74,7 +74,7 @@
   {
     "config_name": "用户协议",
     "config_key": "sys_web_clause",
-    "config_value": "https://github.com/1014TaoTao/FastapiAdmin/blob/master/LICENSE",
+    "config_value": "https://github.com/fastapiadmin/FastapiAdmin/blob/master/LICENSE",
     "config_type": true,
     "status": "0",
     "description": "初始化数据"
@@ -82,7 +82,7 @@
   {
     "config_name": "源码代码",
     "config_key": "sys_git_code",
-    "config_value": "https://github.com/1014TaoTao/FastapiAdmin.git",
+    "config_value": "https://github.com/fastapiadmin/FastapiAdmin.git",
     "config_type": true,
     "status": "0",
     "description": "初始化数据"

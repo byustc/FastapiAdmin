@@ -3383,9 +3383,9 @@ COPY public.sys_param (config_name, config_key, config_value, config_type, id, u
 版权信息	sys_web_copyright	Copyright © 2025-2026 service.fastapiadmin.com 版权所有	t	6	cbd70fb4-28c8-4e13-b9e4-44d461b5c1f1	0	初始化数据	2026-01-03 21:32:18.923125	2026-01-03 21:32:18.923125
 备案信息	sys_keep_record	陕ICP备2025069493号-1	t	7	059c93c3-82c2-4dfd-94f3-e539060d9fbc	0	初始化数据	2026-01-03 21:32:18.923128	2026-01-03 21:32:18.923128
 帮助文档	sys_help_doc	https://service.fastapiadmin.com	t	8	96ea2556-f9f0-403c-8da6-04c01970fe66	0	初始化数据	2026-01-03 21:32:18.923131	2026-01-03 21:32:18.923132
-隐私政策	sys_web_privacy	https://github.com/1014TaoTao/FastapiAdmin/blob/master/LICENSE	t	9	8fc4c4ee-8309-461c-8b62-c9bdeb4586d3	0	初始化数据	2026-01-03 21:32:18.923134	2026-01-03 21:32:18.923135
-用户协议	sys_web_clause	https://github.com/1014TaoTao/FastapiAdmin/blob/master/LICENSE	t	10	b47bde1c-a594-4362-8a0a-85b1574f4069	0	初始化数据	2026-01-03 21:32:18.923138	2026-01-03 21:32:18.923138
-源码代码	sys_git_code	https://github.com/1014TaoTao/FastapiAdmin.git	t	11	8cd060d1-01f6-48da-9150-b4050341e030	0	初始化数据	2026-01-03 21:32:18.923141	2026-01-03 21:32:18.923141
+隐私政策	sys_web_privacy	https://github.com/fastapiadmin/FastapiAdmin/blob/master/LICENSE	t	9	8fc4c4ee-8309-461c-8b62-c9bdeb4586d3	0	初始化数据	2026-01-03 21:32:18.923134	2026-01-03 21:32:18.923135
+用户协议	sys_web_clause	https://github.com/fastapiadmin/FastapiAdmin/blob/master/LICENSE	t	10	b47bde1c-a594-4362-8a0a-85b1574f4069	0	初始化数据	2026-01-03 21:32:18.923138	2026-01-03 21:32:18.923138
+源码代码	sys_git_code	https://github.com/fastapiadmin/FastapiAdmin.git	t	11	8cd060d1-01f6-48da-9150-b4050341e030	0	初始化数据	2026-01-03 21:32:18.923141	2026-01-03 21:32:18.923141
 项目版本	sys_web_version	2.0.0	t	12	f4797975-4fb8-4d5e-8ea9-70330ea2b374	0	初始化数据	2026-01-03 21:32:18.923144	2026-01-03 21:32:18.923144
 演示模式启用	demo_enable	false	t	13	f9d47fb7-72a7-4acc-a61e-13f0436b7664	0	初始化数据	2026-01-03 21:32:18.923147	2026-01-03 21:32:18.923148
 演示访问IP白名单	ip_white_list	["127.0.0.1"]	t	14	9c60b05f-b473-4706-8d5d-60f1f1fc605b	0	初始化数据	2026-01-03 21:32:18.92315	2026-01-03 21:32:18.923151

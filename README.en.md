@@ -9,8 +9,8 @@
           <a href="https://gitee.com/tao__tao/FastapiAdmin.git" target="_blank">
                <img src="https://gitee.com/tao__tao/FastapiAdmin/badge/star.svg?theme=dark" alt="Gitee Stars">
           </a>
-          <a href="https://github.com/1014TaoTao/FastapiAdmin.git" target="_blank">
-               <img src="https://img.shields.io/github/stars/1014TaoTao/FastapiAdmin?style=social" alt="GitHub Stars">
+          <a href="https://github.com/fastapiadmin/FastapiAdmin.git" target="_blank">
+               <img src="https://img.shields.io/github/stars/fastapiadmin/FastapiAdmin?style=social" alt="GitHub Stars">
           </a>
           <a href="https://gitee.com/tao__tao/FastapiAdmin/blob/master/LICENSE" target="_blank">
                <img src="https://img.shields.io/badge/License-MIT-orange" alt="License">
@@ -57,7 +57,7 @@ English | [简体中文](./README.md)
 
 | Platform | Repository |
 |----------|------------|
-| GitHub | [FastapiAdmin Main](https://github.com/1014TaoTao/FastapiAdmin.git) \| [FastDocs Website](https://github.com/1014TaoTao/FastDocs.git) \| [FastApp Mobile](https://github.com/1014TaoTao/FastApp.git) |
+| GitHub | [FastapiAdmin Main](https://github.com/fastapiadmin/FastapiAdmin.git) \| [FastDocs Website](https://github.com/fastapiadmin/FastDocs.git) \| [FastApp Mobile](https://github.com/fastapiadmin/FastApp.git) |
 | Gitee  | [FastapiAdmin Main](https://gitee.com/tao__tao/FastapiAdmin.git) \| [FastDocs Website](https://gitee.com/tao__tao/FastDocs.git) \| [FastApp Mobile](https://gitee.com/tao__tao/FastApp.git) |
 
 ## 📦 Engineering Structure Overview
@@ -136,7 +136,7 @@ FastapiAdmin
 # Clone the repository to your local machine
 git clone https://gitee.com/tao__tao/FastapiAdmin.git
 # Or
-git clone https://github.com/1014TaoTao/FastapiAdmin.git
+git clone https://github.com/fastapiadmin/FastapiAdmin.git
 ```
 
 > **Backend Note**: After cloning the code, you need to rename the `.env.dev.example` file in the `backend/env` directory to `.env.dev`, and rename the `.env.prod.example` file in the `backend/env` directory to `.env.prod`. Then modify the database connection information, Redis connection information, etc., according to the actual situation.
@@ -458,8 +458,8 @@ For more details, please check the [Official Documentation](https://service.fast
 
 ## 👥 Contributors
 
-<a href="https://github.com/1014TaoTao/FastapiAdmin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=1014TaoTao/FastapiAdmin"/>
+<a href="https://github.com/fastapiadmin/FastapiAdmin/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fastapiadmin/FastapiAdmin"/>
 </a>
 
 ## 🙏 Special Thanks
@@ -487,4 +487,4 @@ Thanks to the contributions and support of the following open-source projects:
 
 If you like this project, please give it a ⭐️ Star to show your support! Thank you very much!
 
-[![Stargazers over time](https://starchart.cc/1014TaoTao/FastapiAdmin.svg?variant=adaptive)](https://starchart.cc/1014TaoTao/FastapiAdmin)
+[![Stargazers over time](https://starchart.cc/fastapiadmin/FastapiAdmin.svg?variant=adaptive)](https://starchart.cc/fastapiadmin/FastapiAdmin)

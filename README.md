@@ -9,8 +9,8 @@
           <a href="https://gitee.com/tao__tao/FastapiAdmin.git" target="_blank">
                <img src="https://gitee.com/tao__tao/FastapiAdmin/badge/star.svg?theme=dark" alt="Gitee Stars">
           </a>
-          <a href="https://github.com/1014TaoTao/FastapiAdmin.git" target="_blank">
-               <img src="https://img.shields.io/github/stars/1014TaoTao/FastapiAdmin?style=social" alt="GitHub Stars">
+          <a href="https://github.com/fastapiadmin/FastapiAdmin.git" target="_blank">
+               <img src="https://img.shields.io/github/stars/fastapiadmin/FastapiAdmin?style=social" alt="GitHub Stars">
           </a>
           <a href="https://gitee.com/tao__tao/FastapiAdmin/blob/master/LICENSE" target="_blank">
                <img src="https://img.shields.io/badge/License-MIT-orange" alt="License">
@@ -57,7 +57,7 @@
 
 | 平台 | 仓库地址 |
 |------|----------|
-| GitHub | [FastapiAdmin主工程](https://github.com/1014TaoTao/FastapiAdmin.git) \| [FastDocs官网](https://github.com/1014TaoTao/FastDocs.git) \| [FastApp移动端](https://github.com/1014TaoTao/FastApp.git) |
+| GitHub | [FastapiAdmin主工程](https://github.com/fastapiadmin/FastapiAdmin.git) \| [FastDocs官网](https://github.com/fastapiadmin/FastDocs.git) \| [FastApp移动端](https://github.com/fastapiadmin/FastApp.git) |
 | Gitee  | [FastapiAdmin主工程](https://gitee.com/tao__tao/FastapiAdmin.git) \| [FastDocs官网](https://gitee.com/tao__tao/FastDocs.git) \| [FastApp移动端](https://gitee.com/tao__tao/FastApp.git) |
 
 ## 📦 工程结构概览
@@ -139,7 +139,7 @@ FastapiAdmin
 # 克隆代码到本地
 git clone https://gitee.com/tao__tao/FastapiAdmin.git
 # 或者
-git clone https://github.com/1014TaoTao/FastapiAdmin.git
+git clone https://github.com/fastapiadmin/FastapiAdmin.git
 ```
 
 > **后端注意**：克隆下的代码需要修改 `backend/env` 目录下的 `.env.dev.example` 文件为 `.env.dev`，修改 `backend/env` 目录下的 `.env.prod.example` 文件为 `.env.prod`，然后根据实际情况修改数据库连接信息、Redis连接信息等。
@@ -442,8 +442,8 @@ A：使用 `./deploy.sh` 脚本一键部署到生产环境。
 
 ## 👥 贡献者
 
-<a href="https://github.com/1014TaoTao/FastapiAdmin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=1014TaoTao/FastapiAdmin"/>
+<a href="https://github.com/fastapiadmin/FastapiAdmin/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fastapiadmin/FastapiAdmin"/>
 </a>
 
 ## 🙏 特别鸣谢
@@ -471,4 +471,4 @@ A：使用 `./deploy.sh` 脚本一键部署到生产环境。
 
 如果你喜欢这个项目，请给我一个 ⭐️ Star 支持一下吧！非常感谢！
 
-[![Stargazers over time](https://starchart.cc/1014TaoTao/FastapiAdmin.svg?variant=adaptive)](https://starchart.cc/1014TaoTao/FastapiAdmin)
+[![Stargazers over time](https://starchart.cc/fastapiadmin/FastapiAdmin.svg?variant=adaptive)](https://starchart.cc/fastapiadmin/FastapiAdmin)
