@@ -275,6 +275,8 @@ class GenTableService:
             try:
                 # 直接调用edit_gen_table方法，它会在内部处理排除嵌套字段的逻辑
                 result = await GenTableCRUD(auth).edit_gen_table(table_id, data)
+                if not result:
+                    raise CustomException(msg="更新业务表信息失败")
 
                 # 处理data.columns为None的情况
                 if data.columns:
@@ -285,7 +287,9 @@ class GenTableService:
                             await GenTableColumnCRUD(auth).update_gen_table_column_crud(
                                 gen_table_column.id, column_schema
                             )
-                return GenTableOutSchema.model_validate(result).model_dump()
+                # 重新获取带有预加载关系的对象，避免懒加载导致的MissingGreenlet错误
+                updated_gen_table = await GenTableCRUD(auth).get_gen_table_by_id(table_id)
+                return GenTableOutSchema.model_validate(updated_gen_table).model_dump()
             except Exception as e:
                 raise CustomException(msg=str(e))
         else:
