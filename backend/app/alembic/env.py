@@ -16,17 +16,17 @@ ALEMBIC_VERSION_DIR.mkdir(parents=True, exist_ok=True)
 
 # 清除MappedBase.metadata中的表定义，避免重复注册
 if hasattr(MappedBase, "metadata") and MappedBase.metadata.tables:
-    print(f"🧹 清除已存在的表定义，当前有 {len(MappedBase.metadata.tables)} 个表")
+    print(f"[Alembic] Clearing existing table definitions, found {len(MappedBase.metadata.tables)} tables")
     # 创建一个新的空metadata对象
     from sqlalchemy import MetaData
 
     MappedBase.metadata = MetaData()
-    print("✅️ 已重置metadata")
+    print("[Alembic] Metadata reset complete")
 
 # 自动查找所有模型
-print("🔍 开始查找模型...")
+print("[Alembic] Starting model discovery...")
 found_models = ImportUtil.find_models(MappedBase)
-print(f"📊 找到 {len(found_models)} 个有效模型")
+print(f"[Alembic] Found {len(found_models)} valid models")
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

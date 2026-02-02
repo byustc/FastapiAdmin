@@ -235,6 +235,11 @@
                 {{ scope.row.dept ? scope.row.dept.name : "" }}
               </template>
             </el-table-column>
+            <el-table-column label="租户" prop="tenant" min-width="120">
+              <template #default="scope">
+                {{ scope.row.tenant ? scope.row.tenant.name : "" }}
+              </template>
+            </el-table-column>
             <el-table-column label="性别" prop="gender" min-width="100">
               <template #default="scope">
                 <el-tag v-if="scope.row.gender === '0'" type="success">男</el-tag>
@@ -355,6 +360,9 @@
           <el-descriptions-item label="部门" :span="2">
             {{ detailFormData.dept ? detailFormData.dept.name : "" }}
           </el-descriptions-item>
+          <el-descriptions-item label="租户" :span="2">
+            {{ detailFormData.tenant ? detailFormData.tenant.name : "" }}
+          </el-descriptions-item>
           <el-descriptions-item label="角色" :span="2">
             {{
               detailFormData.roles ? detailFormData.roles.map((item) => item.name).join("、") : ""
@@ -451,6 +459,17 @@
               check-strictly
               :render-after-expand="false"
             />
+          </el-form-item>
+
+          <el-form-item label="租户" prop="tenant_id">
+            <el-select v-model="formData.tenant_id" placeholder="请选择租户" clearable filterable>
+              <el-option
+                v-for="item in tenantOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
 
           <el-form-item label="角色" prop="role_ids">
@@ -564,6 +583,8 @@ import { formatTree } from "@/utils/common";
 import PositionAPI from "@/api/module_system/position";
 import DeptAPI from "@/api/module_system/dept";
 import RoleAPI from "@/api/module_system/role";
+import TenantAPI from "@/api/module_system/tenant";
+import type { TenantTable } from "@/api/module_system/tenant";
 import { formatToDateTime } from "@/utils/dateUtil";
 
 import DeptTree from "./components/DeptTree.vue";
@@ -592,6 +613,8 @@ const deptOptions = ref<OptionType[]>();
 const roleOptions = ref<Array<{ value: number; label: string; disabled?: boolean }>>();
 // 岗位下拉数据源
 const positionOptions = ref<Array<{ value: number; label: string; disabled?: boolean }>>();
+// 租户下拉数据源
+const tenantOptions = ref<Array<{ value: number; label: string }>>();
 // 导入弹窗显示状态
 const importDialogVisible = ref(false);
 // 导出弹窗显示状态
@@ -621,6 +644,7 @@ const formData = reactive<UserForm>({
   name: undefined,
   dept_id: undefined,
   dept_name: undefined,
+  tenant_id: undefined,
   role_ids: undefined,
   role_names: undefined,
   position_ids: undefined,
@@ -875,6 +899,19 @@ async function handleOpenDialog(type: "create" | "update" | "detail", id?: numbe
       disabled: item.status === "1",
     }))
     .filter((opt) => !opt.disabled);
+
+  // 获取租户列表
+  try {
+    const tenantResponse = await TenantAPI.getAllTenants();
+    tenantOptions.value = tenantResponse.data.data
+      .filter((item) => item.is_active)
+      .map((item) => ({
+        value: item.id,
+        label: item.name,
+      }));
+  } catch (error) {
+    console.error("加载租户列表失败:", error);
+  }
 }
 
 // 提交表单（防抖）

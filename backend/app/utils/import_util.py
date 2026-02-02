@@ -137,8 +137,13 @@ class ImportUtil:
                     seen_tables.add(table_name)
                     models.append(obj)
             except ImportError as e:
-                if "cannot import name" not in str(e):
-                    raise ImportError(f"❗️ 警告: 无法导入模块 {module_name}: {e}")
+                # Skip modules with missing dependencies (e.g., pandas, asyncmy)
+                # These are optional and shouldn't block alembic migrations
+                error_msg = str(e)
+                if any(keyword in error_msg for keyword in ["cannot import name", "No module named", "ModuleNotFoundError"]):
+                    print(f"[Alembic] Skipping module {module_name} due to missing dependency: {e}")
+                    continue
+                raise ImportError(f"❗️ 警告: 无法导入模块 {module_name}: {e}")
             except Exception as e:
                 raise CustomException(f"❌️ 处理模块 {module_name} 时出错: {e}")
 

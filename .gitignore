@@ -3,6 +3,7 @@ __pycache__
 .idea
 .DS_Store
 .git
+.claude
 
 backend/__pycache__
 backend/.vscode

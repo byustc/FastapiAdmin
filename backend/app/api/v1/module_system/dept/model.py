@@ -3,14 +3,15 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.base_model import ModelMixin
+from app.core.base_model import ModelMixin, TenantMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.role.model import RoleModel
+    from app.api.v1.module_system.tenant.model import TenantModel
     from app.api.v1.module_system.user.model import UserModel
 
 
-class DeptModel(ModelMixin):
+class DeptModel(ModelMixin, TenantMixin):
     """
     部门模型
     """
@@ -52,5 +53,11 @@ class DeptModel(ModelMixin):
     users: Mapped[list["UserModel"]] = relationship(
         back_populates="dept",
         foreign_keys="UserModel.dept_id",
+        lazy="selectin",
+    )
+    # 覆盖 TenantMixin 的关系定义,显式指定 back_populates
+    tenant: Mapped["TenantModel | None"] = relationship(
+        back_populates="depts",
+        foreign_keys="DeptModel.tenant_id",
         lazy="selectin",
     )

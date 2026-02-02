@@ -188,6 +188,17 @@
           prop="code"
           min-width="120"
         />
+        <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'tenant')?.show"
+          key="tenant"
+          label="租户"
+          prop="tenant"
+          min-width="120"
+        >
+          <template #default="scope">
+            {{ scope.row.tenant ? scope.row.tenant.name : "" }}
+          </template>
+        </el-table-column>
         ')
         <el-table-column
           v-if="tableColumns.find((col) => col.prop === 'status')?.show"
@@ -305,6 +316,9 @@
           <el-descriptions-item label="上级部门" :span="2">
             {{ detailFormData.parent_name }}
           </el-descriptions-item>
+          <el-descriptions-item label="租户" :span="2">
+            {{ detailFormData.tenant ? detailFormData.tenant.name : "" }}
+          </el-descriptions-item>
           <el-descriptions-item label="状态" :span="2">
             <el-tag :type="detailFormData.status ? 'success' : 'danger'">
               {{ detailFormData.status ? "启用" : "停用" }}
@@ -349,6 +363,16 @@
               check-strictly
               :render-after-expand="false"
             />
+          </el-form-item>
+          <el-form-item label="租户" prop="tenant_id">
+            <el-select v-model="formData.tenant_id" placeholder="请选择租户" clearable filterable>
+              <el-option
+                v-for="item in tenantOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="排序" prop="order">
             <el-input-number
@@ -398,6 +422,8 @@ defineOptions({
 });
 
 import DeptAPI, { DeptTable, DeptForm, DeptPageQuery } from "@/api/module_system/dept";
+import TenantAPI from "@/api/module_system/tenant";
+import type { TenantTable } from "@/api/module_system/tenant";
 import { useUserStore } from "@/store";
 import { formatTree } from "@/utils/common";
 import { formatToDateTime } from "@/utils/dateUtil";
@@ -416,12 +442,16 @@ const pageTableData = ref<DeptTable[]>([]);
 // 顶级菜单下拉选项
 const deptOptions = ref<OptionType[]>([]);
 
+// 租户下拉数据源
+const tenantOptions = ref<Array<{ value: number; label: string }>>();
+
 // 表格列配置
 const tableColumns = ref([
   { prop: "selection", label: "选择框", show: true },
   { prop: "index", label: "序号", show: true },
   { prop: "name", label: "部门名称", show: true },
   { prop: "code", label: "部门编码", show: true },
+  { prop: "tenant", label: "租户", show: true },
   { prop: "order", label: "排序", show: true },
   { prop: "status", label: "状态", show: true },
   { prop: "description", label: "描述", show: true },
@@ -447,6 +477,7 @@ const formData = reactive<DeptForm>({
   code: undefined,
   order: 1,
   parent_id: undefined,
+  tenant_id: undefined,
   status: "0",
   description: undefined,
 });
@@ -584,6 +615,19 @@ async function handleOpenDialog(
     }
   }
   dialogVisible.visible = true;
+
+  // 加载租户列表
+  try {
+    const tenantResponse = await TenantAPI.getAllTenants();
+    tenantOptions.value = tenantResponse.data.data
+      .filter((item) => item.is_active)
+      .map((item) => ({
+        value: item.id,
+        label: item.name,
+      }));
+  } catch (error) {
+    console.error("加载租户列表失败:", error);
+  }
 }
 
 // 新增、编辑弹窗处理

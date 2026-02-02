@@ -3,11 +3,12 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.base_model import MappedBase, ModelMixin
+from app.core.base_model import MappedBase, ModelMixin, TenantMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.dept.model import DeptModel
     from app.api.v1.module_system.menu.model import MenuModel
+    from app.api.v1.module_system.tenant.model import TenantModel
     from app.api.v1.module_system.user.model import UserModel
 
 
@@ -60,7 +61,7 @@ class RoleDeptsModel(MappedBase):
     )
 
 
-class RoleModel(ModelMixin):
+class RoleModel(ModelMixin, TenantMixin):
     """
     角色模型
     """
@@ -78,7 +79,7 @@ class RoleModel(ModelMixin):
         Integer,
         default=1,
         nullable=False,
-        comment="数据权限范围(1:仅本人 2:本部门 3:本部门及以下 4:全部 5:自定义)",
+        comment="数据权限范围(1:仅本人 2:本部门 3:本部门及以下 4:本租户 5:全部 6:自定义)",
     )
 
     # 关联关系 (继承自UserMixin)
@@ -93,4 +94,10 @@ class RoleModel(ModelMixin):
     )
     users: Mapped[list["UserModel"]] = relationship(
         secondary="sys_user_roles", back_populates="roles", lazy="selectin"
+    )
+    # 覆盖 TenantMixin 的关系定义,显式指定 back_populates
+    tenant: Mapped["TenantModel | None"] = relationship(
+        back_populates="roles",
+        foreign_keys="RoleModel.tenant_id",
+        lazy="selectin",
     )

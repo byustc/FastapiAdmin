@@ -68,6 +68,8 @@ export interface DeptTable extends BaseType {
   email?: string;
   parent_id?: number;
   parent_name?: string;
+  tenant_id?: number;
+  tenant?: { id: number; name: string };
   children?: DeptTable[];
 }
 
@@ -79,4 +81,5 @@ export interface DeptForm extends BaseFormType {
   phone?: string;
   email?: string;
   parent_id?: number;
+  tenant_id?: number;
 }

@@ -4,12 +4,13 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.base_model import MappedBase, ModelMixin, UserMixin
+from app.core.base_model import MappedBase, ModelMixin, TenantMixin, UserMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.dept.model import DeptModel
     from app.api.v1.module_system.position.model import PositionModel
     from app.api.v1.module_system.role.model import RoleModel
+    from app.api.v1.module_system.tenant.model import TenantModel
 
 
 class UserRolesModel(MappedBase):
@@ -60,7 +61,7 @@ class UserPositionsModel(MappedBase):
     )
 
 
-class UserModel(ModelMixin, UserMixin):
+class UserModel(ModelMixin, UserMixin, TenantMixin):
     """
     用户模型
     """
@@ -69,6 +70,7 @@ class UserModel(ModelMixin, UserMixin):
     __table_args__: dict[str, str] = {"comment": "用户表"}
     __loader_options__: list[str] = [
         "dept",
+        "tenant",
         "roles",
         "positions",
         "created_by",
@@ -113,6 +115,12 @@ class UserModel(ModelMixin, UserMixin):
     )
     dept: Mapped["DeptModel | None"] = relationship(
         back_populates="users", foreign_keys=[dept_id], lazy="selectin"
+    )
+    # 覆盖 TenantMixin 的关系定义,显式指定 back_populates
+    tenant: Mapped["TenantModel | None"] = relationship(
+        back_populates="users",
+        foreign_keys="UserModel.tenant_id",
+        lazy="selectin",
     )
     roles: Mapped[list["RoleModel"]] = relationship(
         secondary="sys_user_roles", back_populates="users", lazy="selectin"

@@ -33,14 +33,15 @@
                   <el-option :key="1" label="仅本人数据权限" :value="1" />
                   <el-option :key="2" label="本部门数据权限" :value="2" />
                   <el-option :key="3" label="本部门及以下数据权限" :value="3" />
-                  <el-option :key="4" label="全部数据权限" :value="4" />
-                  <el-option :key="5" label="自定义数据权限" :value="5" />
+                  <el-option :key="4" label="本租户数据权限" :value="4" />
+                  <el-option :key="5" label="全部数据权限" :value="5" />
+                  <el-option :key="6" label="自定义数据权限" :value="6" />
                 </el-select>
               </el-form-item>
             </el-form>
 
             <div
-              v-if="permissionState.data_scope === 5 && deptTreeData.length"
+              v-if="permissionState.data_scope === 6 && deptTreeData.length"
               class="mt-5 max-h-[60vh] b-1 b-solid b-[#e5e7eb] p-10px overflow-auto box-border"
             >
               <el-input v-model="deptFilterText" placeholder="部门名称" />
@@ -234,7 +235,7 @@ const init = async () => {
     }
 
     // 修改：增加对 deptTreeRef.value 的存在性判断，并添加日志
-    if (permissionState.value.data_scope === 5 && deptTreeRef.value) {
+    if (permissionState.value.data_scope === 6 && deptTreeRef.value) {
       // await 一定不能丢，否则到导致初始化时候deptTreeRef.value 为 undefined
       await deptTreeRef.value.setCheckedKeys(permissionState.value.dept_ids);
     }

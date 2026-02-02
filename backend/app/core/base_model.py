@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -12,6 +12,7 @@ from sqlalchemy.orm import (
 )
 
 if TYPE_CHECKING:
+    from app.api.v1.module_system.tenant.model import TenantModel
     from app.api.v1.module_system.user.model import UserModel
 
 from app.utils.common_util import uuid4_str
@@ -154,5 +155,59 @@ class UserMixin(MappedBase):
             "UserModel",
             lazy="selectin",
             foreign_keys=lambda: self.updated_id,  # pyright: ignore[reportArgumentType]
+            uselist=False,
+        )
+
+
+class TenantMixin(MappedBase):
+    """
+    租户隔离字段 Mixin
+
+    用于需要租户级别数据隔离的表
+    与 UserMixin 配合使用，实现三层隔离：租户 + 部门 + 用户
+
+    使用示例：
+        - 需要租户隔离的表：class YourModel(ModelMixin, UserMixin, TenantMixin)
+        - 不需要租户隔离的表：class YourModel(ModelMixin, UserMixin)
+
+    数据隔离设计原则：
+    ==================
+    租户权限 (tenant_id):
+        - 配合角色的data_scope字段实现租户级数据隔离
+        - 实现跨租户数据隔离和共享
+        - 支持平级租户架构（无租户层级）
+
+    SQLAlchemy加载策略说明:
+    - select(默认): 延迟加载,访问时单独查询
+    - joined: 使用LEFT JOIN预加载
+    - selectin: 使用IN查询批量预加载(推荐用于一对多)
+    - subquery: 使用子查询预加载
+    - raise/raise_on_sql: 禁止加载
+    - noload: 不加载,返回None
+    - immediate: 立即加载
+    - write_only: 只写不读
+    - dynamic: 返回查询对象,支持进一步过滤
+    """
+
+    __abstract__: bool = True
+
+    tenant_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("sys_tenant.id", ondelete="SET NULL", onupdate="CASCADE"),
+        default=None,
+        nullable=True,
+        index=True,
+        comment="所属租户ID",
+    )
+
+    @declared_attr
+    def tenant(self) -> Mapped[Optional["TenantModel"]]:
+        """
+        租户关联关系（延迟加载，避免循环依赖）
+        """
+        return relationship(
+            "TenantModel",
+            lazy="selectin",
+            foreign_keys=lambda: self.tenant_id,  # pyright: ignore[reportArgumentType]
             uselist=False,
         )

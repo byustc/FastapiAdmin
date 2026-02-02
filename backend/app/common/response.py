@@ -4,6 +4,10 @@ from typing import Any
 from fastapi import status
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
+from sqlalchemy import func, select
+from sqlalchemy import inspect as sa_inspect
+from sqlalchemy.engine import Result
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.background import BackgroundTask
 
 from app.common.constant import RET
@@ -159,3 +163,48 @@ class UploadFileResponse(FileResponse):
             method=None,
             content_disposition_type="attachment",
         )
+
+
+async def paginate_response(
+    db: AsyncSession,
+    sql: select,
+    page: int,
+    size: int,
+) -> dict:
+    """
+    分页响应函数
+
+    参数:
+    - db (AsyncSession): 数据库会话
+    - sql (select): SQLAlchemy 查询语句
+    - page (int): 页码（从1开始）
+    - size (int): 每页数量
+
+    返回:
+    - dict: 分页数据
+        - page_no: 当前页码
+        - page_size: 每页数量
+        - total: 总记录数
+        - has_next: 是否有下一页
+        - items: 数据列表
+    """
+    # 获取总数
+    # 尝试从查询中提取模型以优化count查询
+    count_sql = select(func.count()).select_from(sql)
+    total_result = await db.execute(count_sql)
+    total = total_result.scalar() or 0
+
+    # 计算偏移量
+    offset = (page - 1) * size
+
+    # 执行分页查询
+    result: Result = await db.execute(sql.offset(offset).limit(size))
+    items = result.scalars().all()
+
+    return {
+        "page_no": page,
+        "page_size": size,
+        "total": total,
+        "has_next": offset + size < total,
+        "items": items,
+    }

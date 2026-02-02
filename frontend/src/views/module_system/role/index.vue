@@ -207,6 +207,17 @@
           min-width="100"
         />
         <el-table-column
+          v-if="tableColumns.find((col) => col.prop === 'tenant')?.show"
+          key="tenant"
+          label="租户"
+          prop="tenant"
+          min-width="120"
+        >
+          <template #default="scope">
+            {{ scope.row.tenant ? scope.row.tenant.name : "" }}
+          </template>
+        </el-table-column>
+        <el-table-column
           v-if="tableColumns.find((col) => col.prop === 'data_scope')?.show"
           key="data_scope"
           label="数据权限"
@@ -219,8 +230,10 @@
             <el-tag v-else-if="scope.row.data_scope === 3" type="warning">
               本部门及以下数据权限
             </el-tag>
-            <el-tag v-else-if="scope.row.data_scope === 4" type="success">全部数据权限</el-tag>
-            <el-tag v-else type="danger">自定义数据权限</el-tag>
+            <el-tag v-else-if="scope.row.data_scope === 4" type="success">本租户数据权限</el-tag>
+            <el-tag v-else-if="scope.row.data_scope === 5" type="">全部数据权限</el-tag>
+            <el-tag v-else-if="scope.row.data_scope === 6" type="danger">自定义数据权限</el-tag>
+            <el-tag v-else type="info">未知权限</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -363,14 +376,19 @@
           <el-descriptions-item label="角色编码" :span="2">
             {{ detailFormData.code }}
           </el-descriptions-item>
+          <el-descriptions-item label="租户" :span="2">
+            {{ detailFormData.tenant ? detailFormData.tenant.name : "" }}
+          </el-descriptions-item>
           <el-descriptions-item label="数据权限" :span="2">
             <el-tag v-if="detailFormData.data_scope === 1" type="primary">仅本人数据权限</el-tag>
             <el-tag v-else-if="detailFormData.data_scope === 2" type="info">本部门数据权限</el-tag>
             <el-tag v-else-if="detailFormData.data_scope === 3" type="warning">
               本部门及以下数据权限
             </el-tag>
-            <el-tag v-else-if="detailFormData.data_scope === 4" type="success">全部数据权限</el-tag>
-            <el-tag v-else type="danger">自定义数据权限</el-tag>
+            <el-tag v-else-if="detailFormData.data_scope === 4" type="success">本租户数据权限</el-tag>
+            <el-tag v-else-if="detailFormData.data_scope === 5" type="">全部数据权限</el-tag>
+            <el-tag v-else-if="detailFormData.data_scope === 6" type="danger">自定义数据权限</el-tag>
+            <el-tag v-else type="info">未知权限</el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="状态" :span="2">
             <el-tag :type="detailFormData.status ? 'success' : 'danger'">
@@ -413,6 +431,17 @@
 
           <el-form-item label="角色编码" prop="code">
             <el-input v-model="formData.code" placeholder="请输入角色编码" />
+          </el-form-item>
+
+          <el-form-item label="租户" prop="tenant_id">
+            <el-select v-model="formData.tenant_id" placeholder="请选择租户" clearable filterable>
+              <el-option
+                v-for="item in tenantOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
 
           <el-form-item label="状态" prop="status">
@@ -470,6 +499,8 @@ defineOptions({
 
 import { ElMessage, ElMessageBox } from "element-plus";
 import RoleAPI, { RoleTable, RoleForm, TablePageQuery } from "@/api/module_system/role";
+import TenantAPI from "@/api/module_system/tenant";
+import type { TenantTable } from "@/api/module_system/tenant";
 import { useUserStore } from "@/store";
 import ExportModal from "@/components/CURD/ExportModal.vue";
 import type { IContentConfig } from "@/components/CURD/types";
@@ -489,6 +520,9 @@ const pageTableData = ref<RoleTable[]>([]);
 
 // 抽屉显隐
 const drawerVisible = ref(false);
+
+// 租户下拉数据源
+const tenantOptions = ref<Array<{ value: number; label: string }>>();
 
 // 表格列配置
 const tableColumns = ref([
@@ -526,6 +560,7 @@ const formData = reactive<RoleForm>({
   name: undefined,
   order: 1,
   code: undefined,
+  tenant_id: undefined,
   status: "0",
   description: undefined,
 });
@@ -641,6 +676,19 @@ async function handleOpenDialog(type: "create" | "update" | "detail", id?: numbe
     formData.id = undefined;
   }
   dialogVisible.visible = true;
+
+  // 加载租户列表
+  try {
+    const tenantResponse = await TenantAPI.getAllTenants();
+    tenantOptions.value = tenantResponse.data.data
+      .filter((item) => item.is_active)
+      .map((item) => ({
+        value: item.id,
+        label: item.name,
+      }));
+  } catch (error) {
+    console.error("加载租户列表失败:", error);
+  }
 }
 
 // 新增、编辑弹窗处理
