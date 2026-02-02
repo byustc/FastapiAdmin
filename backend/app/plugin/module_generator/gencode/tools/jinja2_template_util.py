@@ -314,8 +314,11 @@ class Jinja2TemplateUtil:
                 merged_imports.append(import_stmt)
 
         if imports_:
-            merged_datetime_import = f"{import_start} {', '.join(imports_)}"
-            merged_imports.append(merged_datetime_import)
+            # 去重并过滤空字符串，然后用逗号连接
+            unique_imports = [item for item in imports_ if item]
+            if len(unique_imports) > 0:
+                merged_datetime_import = f"{import_start} {', '.join(unique_imports)}"
+                merged_imports.append(merged_datetime_import)
 
         return merged_imports
 

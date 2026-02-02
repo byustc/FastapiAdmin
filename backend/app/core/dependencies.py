@@ -10,6 +10,7 @@ from app.api.v1.module_system.auth.schema import AuthSchema
 from app.api.v1.module_system.user.crud import UserCRUD
 from app.api.v1.module_system.user.model import UserModel
 from app.common.enums import RedisInitKeyConfig
+from app.config.setting import settings
 from app.core.database import async_db_session
 from app.core.exceptions import CustomException
 from app.core.logger import log
@@ -82,6 +83,17 @@ async def get_current_user(
     )
     if not online_ok:
         raise CustomException(msg="认证已失效", code=10401, status_code=401)
+
+    # 如果启用了滑动过期，自动续期token
+    if settings.TOKEN_SLIDING_EXPIRE:
+        await RedisCURD(redis).expire(
+            key=f"{RedisInitKeyConfig.ACCESS_TOKEN.key}:{session_id}",
+            expire=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
+        )
+        await RedisCURD(redis).expire(
+            key=f"{RedisInitKeyConfig.REFRESH_TOKEN.key}:{session_id}",
+            expire=settings.REFRESH_TOKEN_EXPIRE_MINUTES,
+        )
 
     # 关闭数据权限过滤，避免当前用户查询被拦截
     auth = AuthSchema(db=db, check_data_scope=False)

@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 30  # refresh_token过期时间(秒)30 分钟
     TOKEN_TYPE: str = "bearer"  # token类型
     TOKEN_REQUEST_PATH_EXCLUDE: list[str] = ["api/v1/auth/login"]  # JWT / RBAC 路由白名单
+    TOKEN_SLIDING_EXPIRE: bool = True  # 是否启用滑动过期(用户操作时自动续期)
 
     # ================================================= #
     # ******************** 数据库配置 ******************* #
